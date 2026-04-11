@@ -1,3 +1,5 @@
+controller\AuthBean.class
 test\DbCheck.class
 controller\ProductBean.class
+com\greenmarket\entity\User.class
 com\greenmarket\entity\Product.class

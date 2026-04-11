@@ -12,6 +12,8 @@
 
                 <p:menuitem value="Shop" icon="pi pi-fw pi-shopping-bag" outcome="/shop/shop.xhtml" />
                 <p:menuitem value="Article" icon="pi pi-fw pi-pencil" outcome="/article/article.xhtml" />
+                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" 
+                rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}" />
 
                 <f:facet name="end">
                     <div class="flex align-items-center gap-3">
@@ -20,13 +22,26 @@
                             <i class="pi pi-fw pi-search" />
                             <p:inputText placeholder="Search" />
                         </div>
-
-                        <p:button icon="pi pi-shopping-cart"
+                        <h:panelGroup rendered="#{authBean.loggedIn}">
+                        <p:button icon="pi pi-shopping-cart" outcome="/shop/basket.xhtml"
                             styleClass="ui-button-rounded ui-button-flat ui-button-secondary" title="ตะกร้าสินค้า" />
-
+                        </h:panelGroup>
                         <p:toggleSwitch value="#{selectBooleanView.value2}" onIcon="pi pi-moon" offIcon="pi pi-sun" />
 
-                        <p:button value="Login" icon="pi pi-user" styleClass="ui-button-success" />
+                        <h:panelGroup rendered="#{not authBean.loggedIn}">
+                            <p:button value="Login" icon="pi pi-user" styleClass="ui-button-success"
+                                outcome="/login/login.xhtml" />
+                        </h:panelGroup>
+
+                        <h:panelGroup rendered="#{authBean.loggedIn}" styleClass="flex align-items-center gap-2">
+                            <p:avatar icon="pi pi-user" styleClass="mr-2" shape="circle" />
+                            <span class="font-bold text-700">
+                                #{authBean.currentUser.name} #{authBean.currentUser.lname}
+                            </span>
+
+                            <p:commandButton value="Logout" icon="pi pi-sign-out" action="#{authBean.logout}"
+                                styleClass="ui-button-danger ui-button-flat ml-2" />
+                        </h:panelGroup>
                     </div>
                 </f:facet>
             </p:menubar>

@@ -67,14 +67,7 @@ public class ProductBean {
 
     @Transactional
     public void saveProduct() {
-        System.out.println("--- เริ่มการบันทึกสินค้า ---");
-        System.out.println("ชื่อสินค้า: " + newProduct.getName());
-        if (uploadedImage == null) {
-            System.out.println("สถานะไฟล์: uploadedImage มีค่าเป็น NULL (ไม่ได้รับไฟล์จากหน้าเว็บ!)");
-        } else {
-            System.out.println("สถานะไฟล์: ได้รับไฟล์ชื่อ " + uploadedImage.getFileName());
-            System.out.println("ขนาดไฟล์: " + uploadedImage.getSize() + " bytes");
-        }
+        // if (currentUser != null && "admin".equals(currentUser.getRole())) {
         try {
             if (uploadedImage != null && uploadedImage.getSize() > 0) {
                      newProduct.setImage(uploadedImage.getContent());
@@ -86,5 +79,6 @@ public class ProductBean {
         } catch (Exception e) {
             System.err.println("Error saving product : " + e.getMessage());
         }
+        
     }
 }
