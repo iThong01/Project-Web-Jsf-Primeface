@@ -1,0 +1,55 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets">
+    
+    <p:outputPanel layout="block" styleClass="p-6 surface-900 text-0 mt-6">
+        <div class="grid">
+            <div class="col-12 md:col-4">
+                <h3 class="text-xl font-bold mb-3">About Us</h3>
+                <h:outputText value="Herbal are an alternative" styleClass="block text-200" />
+                <h:outputText value="that brings you closer to nature." styleClass="block text-200" />
+            </div>
+
+            <div class="col-12 md:col-4">
+                <h3 class="text-xl font-bold mb-3">Contact</h3>
+                <div class="flex flex-column gap-3">
+                    <h:outputLink value="mailto:6705000369@rumail.ru.ac.th" styleClass="no-underline text-200 hover:text-white flex align-items-center gap-3">
+                        <p:graphicImage url="/icons/mail.png" alt="gmail" styleClass="w-2rem h-2rem" />
+                        <h:outputText value="6705000369@rumail.ru.ac.th" />
+                    </h:outputLink>
+                    <h:outputLink value="#" styleClass="no-underline text-200 hover:text-white flex align-items-center gap-3">
+                        <p:graphicImage url="/icons/location.png" alt="Address" styleClass="w-2rem h-2rem" />
+                        <h:outputText value="333/3 Watthana Bankok Thailand 10110" />
+                    </h:outputLink>
+                </div>
+            </div>
+
+            <div class="col-12 md:col-4">
+                <h3 class="text-xl font-bold mb-3">Social</h3>
+                <div class="flex flex-column gap-3">
+                    <h:outputLink value="#" styleClass="no-underline text-200 hover:text-white flex align-items-center gap-3">
+                        <p:graphicImage url="/icons/facebook.png" alt="face" styleClass="w-2rem h-2rem" />
+                        <h:outputText value="Samattha" />
+                    </h:outputLink>
+                    <h:outputLink value="#" styleClass="no-underline text-200 hover:text-white flex align-items-center gap-3">
+                        <p:graphicImage url="/icons/line.png" alt="line" styleClass="w-2rem h-2rem" />
+                        <h:outputText value="tongchai" />
+                    </h:outputLink>
+                    <h:outputLink value="#" styleClass="no-underline text-200 hover:text-white flex align-items-center gap-3">
+                        <p:graphicImage url="/icons/instagram.png" alt="ig" styleClass="w-2rem h-2rem" />
+                        <h:outputText value="stt_1005" />
+                    </h:outputLink>
+                </div>
+            </div>
+        </div>
+       
+        <p:divider styleClass="mt-5 border-700" />
+        
+        <div class="text-center text-400 mt-4">
+            <h:outputText value="© 2026 Green Market. All rights reserved." />
+        </div>
+    </p:outputPanel>
+
+</ui:composition>

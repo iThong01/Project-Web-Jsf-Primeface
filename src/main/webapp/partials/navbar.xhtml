@@ -1,0 +1,36 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets">
+    <div class="card">
+        <h:form>
+            <p:growl id="messages"/>
+
+            <p:menubar hideDelay="1000">
+                <f:facet name="start">
+                    <h2 >Green Market</h2>
+                </f:facet>
+                <p:menuitem value="Shop" icon="pi pi-fw pi-shopping-bag" outcome="/shop/shop.xhtml" />
+
+                <p:menuitem value="Article" icon="pi pi-fw pi-pencil" outcome="/article/article.xhtml" />
+
+                <p:divider layout="vertical"/>
+                
+                    <div class="ui-input-icon-left mr-2">
+                    <i class="pi pi-fw pi-search" />
+                    <p:inputText placeholder="Search"/>
+                </div>
+                
+                <f:facet name="end">
+                    <p:button icon="pi pi-shopping-cart"
+                      styleClass="ui-button-rounded ui-button-flat mr-2"
+                      title="ตะกร้าสินค้า" />
+                    <h5>Icon</h5>
+                    <p:toggleSwitch value="#{selectBooleanView.value2}" onIcon="pi pi-check" offIcon="pi pi-times" />
+                    <p:button value="Login" icon="pi pi-user" styleClass="ui-button-success"/>
+                </f:facet>
+            </p:menubar>
+        </h:form>
+    </div>
+</ui:composition>

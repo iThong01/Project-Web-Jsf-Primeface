@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui"
+       xmlns:ui="jakarta.faces.facelets">
+    <h:head>
+        <title>Shop</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
+    </h:head>
+    <h:body>
+        <ui:include src="../partials/navbar.xhtml" />
+        <div class="product card">
+            <h:form>
+                    <div style="margin-bottom: 20px;">
+                        <p:commandButton value="กลับระบบจัดการหลังบ้าน"
+                                action="/index?faces-redirect=true" icon="pi pi-arrow-left"
+                                styleClass="ui-button-secondary ui-button-outlined" />
+                    </div>
+                </h:form>
+            <h:form id="form">
+                <p:dataView var="p" value="#{productBean.productList}" rows="12" paginator="true"
+                            paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}"
+                            gridIcon="pi pi-th-large" listIcon="pi pi-bars"
+                            layout="grid" gridRowStyleClass="lg:col-6 xl:col-4" flex="true">
+
+                    <p:dataViewGridItem>
+                        <div class="product-grid-item card border-1">
+                            <div class="product-grid-item-top">
+                                <div>
+                                    <i class="pi pi-tag product-category-icon"/>
+                                    <span class="product-category">ผง</span>
+                                </div>
+                                
+                            </div>
+                            <div class="product-grid-item-content">
+                                <div class="product-name">#{p.name}</div>
+                                <div class="product-description">#{p.description}</div>
+                            </div>
+                            <div class="product-grid-item-bottom">
+                                <h:outputText value="#{p.price}" styleClass="product-price">
+                                    <f:convertNumber currencySymbol="$" type="currency"/>
+                                </h:outputText>
+                                <p:commandButton type="button"
+                                                 value="Add To Cart"
+                                                 icon="pi pi-shopping-cart"
+                                                 disabled="#{p.count == 0 }">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:dataViewGridItem>
+
+                    <p:dataViewListItem>
+                        <div class="product-list-item">
+                            <div class="product-list-detail">
+                                <div class="product-name">#{p.name}</div>
+                                <div class="product-description">#{p.description}</div>
+                                <i class="pi pi-tag product-category-icon"/><span class="product-category">สินค้าทั่วไป</span>
+                            </div>
+                            <div class="product-list-action">
+                                <h:outputText value="#{p.price}" styleClass="product-price">
+                                    <f:convertNumber currencySymbol="$" type="currency"/>
+                                </h:outputText>
+                                <p:commandButton type="button"
+                                                 value="Add To Cart"
+                                                 icon="pi pi-shopping-cart"
+                                                 disabled="#{p.count == 0}">
+                                </p:commandButton>
+                            </div>
+                        </div>
+                    </p:dataViewListItem>
+                </p:dataView>
+
+            </h:form>
+        </div>
+        <ui:include src="../partials/footer.xhtml" />
+    </h:body>
+</html>
