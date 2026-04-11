@@ -8,9 +8,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Base64;
 
 @Entity
 @Table(name = "shop")
@@ -26,7 +28,9 @@ public class Product implements Serializable {
 
     private String description;
 
-    private String image;
+    @Lob
+    @jakarta.persistence.Column(columnDefinition = "MEDIUMBLOB")
+    private byte[] image;
 
     private Integer count;
 
@@ -62,12 +66,18 @@ public class Product implements Serializable {
         this.description = description;
     }
 
-    public String getImage() {
+    public byte[] getImage() {
         return image;
     }
 
-    public void setImage(String image) {
+    public void setImage(byte[] image) {
         this.image = image;
+    }
+    public String getBase64Image(){
+        if(this.image != null && this.image.length>0){
+            return Base64.getEncoder().encodeToString(this.image);
+        }
+        return null;
     }
 
     public Integer getCount() {

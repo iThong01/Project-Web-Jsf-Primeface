@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import jakarta.annotation.sql.DataSourceDefinition;
 import jakarta.annotation.PostConstruct;
+import org.primefaces.model.file.UploadedFile;
 
 @DataSourceDefinition(
         name = "java:app/jdbc/GreenMarketDS2",
@@ -29,6 +30,7 @@ public class ProductBean {
     private EntityManager em;
     private List<Product> productList;
     private Product newProduct = new Product();
+    private UploadedFile uploadedImage;
 
     public List<Product> getProductList() {
         return productList;
@@ -46,6 +48,14 @@ public class ProductBean {
         this.newProduct = newProduct;
     }
 
+    public UploadedFile getUploadedImage() {
+        return uploadedImage;
+    }
+
+    public void setUploadedImage(UploadedFile uploadedImage) {
+        this.uploadedImage = uploadedImage;
+    }
+    
     @PostConstruct
     public void init() {
         loadProducts();
@@ -57,9 +67,21 @@ public class ProductBean {
 
     @Transactional
     public void saveProduct() {
+        System.out.println("--- เริ่มการบันทึกสินค้า ---");
+        System.out.println("ชื่อสินค้า: " + newProduct.getName());
+        if (uploadedImage == null) {
+            System.out.println("สถานะไฟล์: uploadedImage มีค่าเป็น NULL (ไม่ได้รับไฟล์จากหน้าเว็บ!)");
+        } else {
+            System.out.println("สถานะไฟล์: ได้รับไฟล์ชื่อ " + uploadedImage.getFileName());
+            System.out.println("ขนาดไฟล์: " + uploadedImage.getSize() + " bytes");
+        }
         try {
+            if (uploadedImage != null && uploadedImage.getSize() > 0) {
+                     newProduct.setImage(uploadedImage.getContent());
+                 }
             em.persist(newProduct);
             newProduct = new Product();
+            uploadedImage = null;
             loadProducts();
         } catch (Exception e) {
             System.err.println("Error saving product : " + e.getMessage());
