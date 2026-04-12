@@ -16,6 +16,9 @@ import java.io.Serializable;
 import java.util.Date;
 import jakarta.transaction.Transactional;
 
+import com.greenmarket.util.CookieUtil;
+import com.greenmarket.util.JwtUtil;
+
 @Named(value = "authBean")
 @SessionScoped
 public class AuthBean implements Serializable {
@@ -106,11 +109,16 @@ public class AuthBean implements Serializable {
                     .setParameter("user", user)
                     .setParameter("password", password)
                     .getSingleResult();
-            currentUser = userObj;
-    
-            handleRememberMeCookie();
+
+            String token = JwtUtil.generateToken(userObj.getUser(), userObj.getRole());
+            HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+            CookieUtil.addCookie(response, "AUTH_TOKEN", token, 60*60*24, true);
+
+            this.currentUser = userObj;
+            if (rememberMe) CookieUtil.addCookie(response, "remember_user", user, 60*60*24*10, false);
+            else CookieUtil.removeCookie(response, "remember_user");
+           
             return "/index.xhtml?faces-redirect=true";
-    
         } catch (NoResultException e) {
             FacesContext.getCurrentInstance().addMessage(null,
                     new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed", "Username หรือรหัสผ่านไม่ถูกต้อง"));
@@ -140,11 +148,11 @@ public class AuthBean implements Serializable {
         this.currentUser = null;
         this.user = null;
         this.password = null;
-        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
 
-        ec.invalidateSession();
-    
-        return "/login/login.xhtml?faces-redirect=true";
+        CookieUtil.removeCookie(response, "AUTH_TOKEN");
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+        return "/index.xhtml?faces-redirect=true";
     }
 
     @jakarta.transaction.Transactional

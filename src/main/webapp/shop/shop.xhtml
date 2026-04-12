@@ -70,6 +70,7 @@
                                         <f:convertNumber pattern="#0.00" />
                                     </h:outputText>
                                     <p:commandButton type="button" value="Add" icon="pi pi-shopping-cart"
+                                        rendered="#{authBean.loggedIn}"
                                         disabled="#{p.count == 0 }" styleClass="ui-button-success" />
                                 </div>
                             </div>
@@ -100,8 +101,11 @@
                                     <span class="#{p.count > 0 ? 'text-green-500' : 'text-red-500'} font-bold mb-3">
                                         #{p.count > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                                     </span>
-                                    <p:commandButton type="button" value="Add to Cart" icon="pi pi-shopping-cart"
+                                    <p:commandButton type="button" rendered="#{authBean.loggedIn}"  value="Add to Cart" icon="pi pi-shopping-cart"
                                         disabled="#{p.count == 0}" styleClass="ui-button-success" />
+                                    <p:button value="Login to Shop" icon="pi pi-sign-in"
+                                            rendered="#{not authBean.loggedIn}" 
+                                            outcome="/login/login.xhtml" />
                                 </div>
                             </div>
                         </p:dataViewListItem>
