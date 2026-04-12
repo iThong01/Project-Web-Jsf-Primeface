@@ -26,7 +26,7 @@
                         <p:button icon="pi pi-shopping-cart" outcome="/shop/basket.xhtml"
                             styleClass="ui-button-rounded ui-button-flat ui-button-secondary" title="ตะกร้าสินค้า" />
                         </h:panelGroup>
-                        <p:toggleSwitch value="#{selectBooleanView.value2}" onIcon="pi pi-moon" offIcon="pi pi-sun" />
+                        
 
                         <h:panelGroup rendered="#{not authBean.loggedIn}">
                             <p:button value="Login" icon="pi pi-user" styleClass="ui-button-success"
@@ -39,7 +39,8 @@
                                 #{authBean.currentUser.name} #{authBean.currentUser.lname}
                             </span>
 
-                            <p:commandButton value="Logout" icon="pi pi-sign-out" action="#{authBean.logout}"
+                            <p:commandButton value="Logout" icon="pi pi-sign-out" 
+                                action="#{authBean.logout}" update="@all"
                                 styleClass="ui-button-danger ui-button-flat ml-2" />
                         </h:panelGroup>
                     </div>
