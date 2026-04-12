@@ -12,9 +12,9 @@
 
                 <p:menuitem value="Shop" icon="pi pi-fw pi-shopping-bag" outcome="/shop/shop.xhtml" />
                 <p:menuitem value="Article" icon="pi pi-fw pi-pencil" outcome="/article/article.xhtml" />
-                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" 
-                rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}" />
-
+                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" />
+                <!-- rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}"  -->
+                
                 <f:facet name="end">
                     <div class="flex align-items-center gap-3">
 

@@ -21,7 +21,7 @@
                 </h:form>
    
                 <h:form id="productForm" enctype="multipart/form-data">
-                    <p:panel header="เพิ่มสินค้าใหม่" styleClass="mb-4 shadow-2">
+                    <p:panel header="#{empty productBean.newProduct.id ? 'เพิ่มสินค้าใหม่' : 'แก้ไขสินค้า'}" styleClass="mb-4 shadow-2" id="productPanel">
                         <div class="grid p-fluid">
                             <div class="col-12 md:col-6 field">
                                 <p:outputLabel for="name" value="ชื่อสินค้า:" />
@@ -78,7 +78,11 @@
                         <p:column headerText="ชื่อสินค้า">
                             <h:outputText value="#{p.name}" />
                         </p:column>
-   
+                        
+                        <p:column headerText="รายละเอียด" >
+                            <h:outputText value="#{p.description}" />
+                        </p:column>
+
                         <p:column headerText="ราคา" width="15%">
                             <h:outputText value="$#{p.price}">
                                 <f:convertNumber pattern="#0.00" />
@@ -88,7 +92,28 @@
                         <p:column headerText="จำนวน" width="15%">
                             <h:outputText value="#{p.count}" />
                         </p:column>
+   
+                        <p:column headerText="จัดการ" width="15%" styleClass="text-center">
+                            <p:commandButton icon="pi pi-pencil" 
+                                             styleClass="ui-button-warning ui-button-flat mr-2" 
+                                             title="แก้ไข"
+                                             action="#{productBean.editProduct(p)}"
+                                             update=":productForm" />
+                            
+                            <p:commandButton icon="pi pi-trash" 
+                                             styleClass="ui-button-danger ui-button-flat" 
+                                             title="ลบ"
+                                             action="#{productBean.deleteProduct(p)}"
+                                             update=":productTableForm :productForm:messages">
+                                <p:confirm header="ยืนยันการลบ" message="คุณต้องการลบสินค้านี้ใช่หรือไม่?" icon="pi pi-exclamation-triangle" />
+                            </p:commandButton>
+                        </p:column>
                     </p:dataTable>
+   
+                    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                        <p:commandButton value="ไม่" type="button" styleClass="ui-confirmdialog-no ui-button-flat"/>
+                        <p:commandButton value="ใช่, ลบเลย" type="button" styleClass="ui-confirmdialog-yes ui-button-danger" />
+                    </p:confirmDialog>
                 </h:form>
             </div>
    

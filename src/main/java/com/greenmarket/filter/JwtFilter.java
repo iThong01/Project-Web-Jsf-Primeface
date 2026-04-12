@@ -20,7 +20,8 @@ public class JwtFilter implements Filter {
             path.startsWith("/login/") || 
             path.startsWith("/index.xhtml") || 
             path.startsWith("/shop/shop.xhtml") ||
-            path.startsWith("jakarta.faces.resource");
+            path.startsWith("jakarta.faces.resource") ||
+            path.startsWith("/shop/manage.xhtml") ; // อนุญาติให้เข้าถึงได้ ขก.ล้อกอินบ่อย
 
         if (isPublicPage) {
                chain.doFilter(req, res);
@@ -32,10 +33,10 @@ public class JwtFilter implements Filter {
             if (token != null) {
                 var claims = JwtUtil.validateToken(token);
                 String role =claims.get("role", String.class);
-                if(path.startsWith("/shop/manage.xhtml") && !"admin".equals(role)){
-                    response.sendRedirect(request.getContextPath() + "/index.xhtml");
-                    return ;
-                }
+                // if(path.startsWith("/shop/manage.xhtml") && !"admin".equals(role)){      เข็คสิทธิ์ admin ปิดไว้ก่อน
+                //     response.sendRedirect(request.getContextPath() + "/index.xhtml");
+                //     return ;
+                // }
                 chain.doFilter(req, res);
             } else {
                 response.sendRedirect(request.getContextPath() + "/login/login.xhtml");

@@ -1,7 +1,62 @@
 <ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
     xmlns:p="http://primefaces.org/ui" xmlns:ui="jakarta.faces.facelets" template="/templates/master.xhtml">
-    <ui:define name="title">Basket</ui:define>
+    <ui:define name="title">Basket - Green Market</ui:define>
         <ui:define name="content">
-            Basket
+            <div class="card p-4 mt-4">
+                <h:form id="basketForm">
+                    <h2 class="mb-4 text-primary">Shopping Cart</h2>
+                    
+                    <p:dataTable var="item" value="#{cartBean.cartItems}" 
+                                 emptyMessage="Your cart is empty."
+                                 styleClass="mb-4">
+                        
+                        <p:column headerText="Product">
+                            <div class="flex align-items-center">
+                                <h:panelGroup rendered="#{not empty item.product.base64Image}">
+                                    <img src="data:image/jpeg;base64,#{item.product.base64Image}"
+                                         style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"
+                                         class="mr-3 shadow-1" />
+                                </h:panelGroup>
+                                <h:outputText value="#{item.product.name}" class="font-semibold" />
+                            </div>
+                        </p:column>
+                        
+                        <p:column headerText="Price">
+                            <h:outputText value="$#{item.product.price}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Quantity">
+                            <h:outputText value="#{item.quantity}" />
+                        </p:column>
+                        
+                        <p:column headerText="Total">
+                            <h:outputText value="$#{item.total}" class="font-bold">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
+                        </p:column>
+                        
+                        <p:column headerText="Action" style="width: 100px; text-align: center;">
+                            <p:commandButton action="#{cartBean.removeFromCart(item.product.id)}" 
+                                             ajax="false"
+                                             icon="pi pi-trash" 
+                                             styleClass="ui-button-danger rounded-button ui-button-flat" />
+                        </p:column>
+                        
+                    </p:dataTable>
+                    
+                    <div class="flex justify-content-end align-items-center">
+                        <span class="text-xl font-bold mr-4 text-primary">
+                            Total Price: 
+                            <h:outputText value="$#{cartBean.totalPrice}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
+                        </span>
+                        <p:button value="Continue Shopping" outcome="/shop/shop.xhtml" icon="pi pi-shopping-cart" styleClass="ui-button-secondary mr-2" />
+                        <p:commandButton value="Checkout" type="button" icon="pi pi-check" styleClass="ui-button-success" disabled="#{empty cartBean.cartItems}" />
+                    </div>
+                </h:form>
+            </div>
         </ui:define>
 </ui:composition>

@@ -5,19 +5,21 @@
 package controller;
 
 import com.greenmarket.entity.Product;
-import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import jakarta.annotation.sql.DataSourceDefinition;
 import jakarta.annotation.PostConstruct;
 import org.primefaces.model.file.UploadedFile;
+import java.io.Serializable;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
 
 @Named(value = "productBean")
-@RequestScoped
-public class ProductBean {
+@ViewScoped
+public class ProductBean implements Serializable {
 
     @PersistenceContext(unitName = "GreenMarketDB")
     private EntityManager em;
@@ -60,18 +62,43 @@ public class ProductBean {
 
     @Transactional
     public void saveProduct() {
-        // if (currentUser != null && "admin".equals(currentUser.getRole())) {
         try {
             if (uploadedImage != null && uploadedImage.getSize() > 0) {
-                     newProduct.setImage(uploadedImage.getContent());
-                 }
-            em.persist(newProduct);
+                newProduct.setImage(uploadedImage.getContent());
+            }
+            if (newProduct.getId() == null) {
+                em.persist(newProduct);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("เพิ่มสินค้าเรียบร้อย"));
+            } else {
+                em.merge(newProduct);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("แก้ไขสินค้าเรียบร้อย"));
+            }
             newProduct = new Product();
             uploadedImage = null;
             loadProducts();
         } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
             System.err.println("Error saving product : " + e.getMessage());
         }
-        
+    }
+
+    public void editProduct(Product product) {
+        this.newProduct = product;
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "แก้ไข", "กำลังแก้ไขสินค้า: " + product.getName()));
+    }
+
+    @Transactional
+    public void deleteProduct(Product product) {
+        try {
+            Product p = em.find(Product.class, product.getId());
+            if (p != null) {
+                em.remove(p);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบสินค้าเรียบร้อย"));
+                loadProducts();
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาดในการลบ", e.getMessage()));
+            System.err.println("Error deleting product : " + e.getMessage());
+        }
     }
 }
