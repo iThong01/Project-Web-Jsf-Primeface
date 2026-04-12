@@ -15,13 +15,6 @@ import jakarta.annotation.sql.DataSourceDefinition;
 import jakarta.annotation.PostConstruct;
 import org.primefaces.model.file.UploadedFile;
 
-@DataSourceDefinition(
-        name = "java:app/jdbc/GreenMarketDS2",
-        className = "com.mysql.cj.jdbc.MysqlDataSource",
-        url = "jdbc:mysql://localhost:3306/greenmarket?serverTimezone=UTC&sslMode=DISABLED&allowPublicKeyRetrieval=true",
-        user = "root",
-        password = "T12345678"
-)
 @Named(value = "productBean")
 @RequestScoped
 public class ProductBean {
