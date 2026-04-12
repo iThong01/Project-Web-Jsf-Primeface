@@ -1,20 +1,7 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
-
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
-
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
-        
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="jakarta.faces.html" xmlns:f="jakarta.faces.core"
+    xmlns:p="http://primefaces.org/ui" xmlns:ui="jakarta.faces.facelets" template="/templates/master.xhtml">
+    <ui:define name="title">Basket</ui:define>
+        <ui:define name="content">
+            Basket
+        </ui:define>
+</ui:composition>
