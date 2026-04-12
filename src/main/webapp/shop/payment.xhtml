@@ -1,20 +1,53 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/templates/master.xhtml">
+    <ui:define name="title">Payment - Green Market</ui:define>
 
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
+    <ui:define name="content">
+        <div class="flex justify-content-center mt-4">
+            <div class="card p-5 shadow-3" style="max-width: 500px; width: 100%;">
+                <h:form id="paymentForm">
+                    <p:messages id="messages" showDetail="true" closable="true">
+                        <p:autoUpdate/>
+                    </p:messages>
 
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
-        
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+                    <div class="text-center mb-4">
+                        <h2 class="text-primary mb-2">QR Code Payment</h2>
+                        <p class="text-600">Please scan the QR code to complete your payment.</p>
+                    </div>
+
+                    <div class="flex justify-content-center mb-4">
+                        <!-- Simulated QR Code using PrimeFaces Barcode or an Icon -->
+                        <div class="border-round p-4" style="background: white; border: 2px dashed #4caf50;">
+                            <p:barcode value="PromptPay Simulator: #{cartBean.totalPrice} Baht" type="qr" format="svg" width="200" height="200" />
+                        </div>
+                    </div>
+
+                    <div class="text-center mb-4 border-bottom-1 surface-border pb-3">
+                        <div class="text-xl">Total Amount to Pay:</div>
+                        <div class="text-3xl font-bold text-green-600 mt-2">
+                            <h:outputText value="$#{cartBean.totalPrice}">
+                                <f:convertNumber pattern="#0.00" />
+                            </h:outputText>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <p:commandButton action="#{paymentBean.processPayment}" 
+                                         ajax="false"
+                                         value="Simulate Payment Success" 
+                                         icon="pi pi-check-circle" 
+                                         styleClass="ui-button-success w-full p-3 text-lg font-bold" />
+                        
+                        <div class="mt-3">
+                            <p:button outcome="/shop/basket.xhtml" value="Cancel and Go Back" icon="pi pi-times" styleClass="ui-button-danger ui-button-flat w-full" />
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

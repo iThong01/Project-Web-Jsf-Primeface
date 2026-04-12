@@ -95,6 +95,25 @@ public class AuthBean implements Serializable {
     }
 
     public User getCurrentUser() {
+        if (currentUser == null) {
+            try {
+                HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+                if (request != null) {
+                    String token = CookieUtil.getCookieValue(request, "AUTH_TOKEN");
+                    if (token != null && !token.isEmpty()) {
+                        var claims = JwtUtil.validateToken(token);
+                        String username = claims.getSubject();
+                        if (username != null) {
+                            currentUser = em.createQuery("SELECT u FROM User u WHERE u.user = :user", User.class)
+                                    .setParameter("user", username)
+                                    .getSingleResult();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                // Token invalid or expired, currentUser remains null
+            }
+        }
         return currentUser;
     }
 

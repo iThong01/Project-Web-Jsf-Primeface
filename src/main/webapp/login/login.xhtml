@@ -9,16 +9,14 @@
     <h:outputScript name="js/primeblocks.js" />
 </h:head>
 
-<h:body>
-    <div class="flex align-items-center justify-content-center">
-        <div class="surface-card p-4 shadow-2 border-round w-full lg:w-6">
+<h:body styleClass="surface-ground">
+    <div class="flex align-items-center justify-content-center min-h-screen">
+        <div class="surface-card p-4 shadow-2 border-round w-full sm:w-8 md:w-6 lg:w-4 xl:w-3">
             <div class="text-center mb-5">
-                <!-- <p:graphicImage name="images/blocks/logos/hyper.svg" library="primeblocks-app" alt="Image" height="50"
-                    styleClass="mb-3" /> -->
                 <div class="text-900 text-3xl font-medium mb-3">Welcome Back</div>
                 <span class="text-600 font-medium line-height-3">Don't have an account?</span>
                 
-                    <p:link outcome="register.xhtml" value="Create today!" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer"></p:link>
+                <p:link outcome="register.xhtml" value="Create today!" class="font-medium no-underline ml-2 text-blue-500 cursor-pointer"></p:link>
                 
             </div>
 
@@ -27,20 +25,23 @@
                     <p:autoUpdate />
                 </p:messages>
                 <div>
-                    <label for="username" class="block text-900 font-medium mb-2">Username</label>
-                    <p:inputText id="username" value="#{authBean.user}" required="true"
-                        requiredMessage="กรุณากรอก Username" styleClass="w-full mb-3" placeholder="username...." />
-                    <label for="password1" class="block text-900 font-medium mb-2">Password</label>
-                    <p:password id="password" value="#{authBean.password}" required="true"
-                        requiredMessage="กรุณากรอกรหัสผ่าน" styleClass="w-full mb-3" placeholder="password...." />
+                    <span class="ui-float-label">
+                         <p:inputText id="username" value="#{authBean.user}" required="true" 
+                                      requiredMessage="กรุณากรอก Username" />
+                         <p:outputLabel for="@previous" value="Username"/>
+                    </span>
+                    <span class="ui-float-label mt-5 mb-5">
+                         <p:password id="password" value="#{authBean.password}" required="true" toggleMask="true" redisplay="true"
+                                      requiredMessage="กรุณากรอก Password" />
+                         <p:outputLabel for="@previous" value="Password"/>
+                    </span>
 
                     <div class="flex align-items-center justify-content-between mb-6">
                         <div class="flex align-items-center">
                             <p:selectBooleanCheckbox id="rememberme" value="#{authBean.rememberMe}" styleClass="mr-2" />
                             <label for="rememberme">Remember me</label>
                         </div>
-                        <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your
-                            password?</a>
+                        <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
                     </div>
 
                     <p:commandButton value="Sign In" action="#{authBean.login}" icon="pi pi-user"

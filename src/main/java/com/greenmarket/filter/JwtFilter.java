@@ -2,54 +2,58 @@ package com.greenmarket.filter;
 
 import com.greenmarket.util.CookieUtil;
 import com.greenmarket.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.annotation.WebFilter;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @WebFilter("/*")
 public class JwtFilter implements Filter {
+
+    @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) req;
         HttpServletResponse response = (HttpServletResponse) res;
-        String path = request.getRequestURI().substring(request.getContextPath().length());
 
-        boolean isPublicPage = path.equals("/") ||
-            path.startsWith("/login/") || 
-            path.startsWith("/index.xhtml") || 
-            path.startsWith("/shop/shop.xhtml") ||
-            path.startsWith("jakarta.faces.resource");
+        String contextPath = request.getContextPath();
+        String path = request.getRequestURI().substring(contextPath.length());
 
-        if (isPublicPage) {
-               chain.doFilter(req, res);
+        if (isPublicPage(path)) {
+            chain.doFilter(req, res);
             return;
-           }
-        
+        }
+
         String token = CookieUtil.getCookieValue(request, "AUTH_TOKEN");
+
+        if (token == null || token.trim().isEmpty()) {
+            response.sendRedirect(contextPath + "/login/login.xhtml");
+            return;
+        }
+
         try {
-            if (token != null) {
-                var claims = JwtUtil.validateToken(token);
-                String role =claims.get("role", String.class);
-                if(path.startsWith("/shop/manage.xhtml") && !"admin".equals(role)){
-                    response.sendRedirect(request.getContextPath() + "/index.xhtml");
-                    return ;
-                }
-                chain.doFilter(req, res);
-            } else {
-                response.sendRedirect(request.getContextPath() + "/login/login.xhtml");
+            Claims claims = JwtUtil.validateToken(token);
+            String role = claims.get("role", String.class);
+
+            if (path.startsWith("/shop/manage.xhtml") && !"admin".equals(role)) {
+                response.sendRedirect(contextPath + "/index.xhtml");
+                return;
             }
+
+            chain.doFilter(req, res);
+
         } catch (Exception e) {
-            response.sendRedirect(request.getContextPath() + "/login/login.xhtml");
+            response.sendRedirect(contextPath + "/login/login.xhtml");
         }
     }
-    private String getJwtFromCookie(HttpServletRequest request) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("AUTH_TOKEN".equals(cookie.getName())) return cookie.getValue();
-            }
-        }
-        return null;
+
+    private boolean isPublicPage(String path) {
+        return path.equals("/") ||
+               path.startsWith("/login/") ||
+               path.startsWith("/index.xhtml") ||
+               path.startsWith("/shop/shop.xhtml") ||
+               path.startsWith("/jakarta.faces.resource") ||
+               path.startsWith("/javax.faces.resource");
     }
 }

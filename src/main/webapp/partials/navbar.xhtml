@@ -12,9 +12,9 @@
 
                 <p:menuitem value="Shop" icon="pi pi-fw pi-shopping-bag" outcome="/shop/shop.xhtml" />
                 <p:menuitem value="Article" icon="pi pi-fw pi-pencil" outcome="/article/article.xhtml" />
-                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" 
-                rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}" />
-
+                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" />
+                <!-- rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}"  -->
+                
                 <f:facet name="end">
                     <div class="flex align-items-center gap-3">
 
@@ -33,15 +33,18 @@
                                 outcome="/login/login.xhtml" />
                         </h:panelGroup>
 
-                        <h:panelGroup rendered="#{authBean.loggedIn}" styleClass="flex align-items-center gap-2">
-                            <p:avatar icon="pi pi-user" styleClass="mr-2" shape="circle" />
-                            <span class="font-bold text-700">
-                                #{authBean.currentUser.name} #{authBean.currentUser.lname}
-                            </span>
-
-                            <p:commandButton value="Logout" icon="pi pi-sign-out" 
-                                action="#{authBean.logout}" update="@all"
-                                styleClass="ui-button-danger ui-button-flat ml-2" />
+                        <h:panelGroup rendered="#{authBean.loggedIn}" styleClass="flex align-items-center gap-2 ml-3">
+                            <p:avatar icon="pi pi-user" shape="circle" styleClass="bg-primary text-white" />
+                            
+                            <p:menuButton value="#{authBean.currentUser.user}" 
+                                          buttonStyleClass="ui-button-flat ui-button-plain font-bold text-700 p-0 ml-1">
+                                <p:menuitem value="ประวัติการสั่งซื้อ" outcome="/shop/history.xhtml" icon="pi pi-history" />
+                                
+                                <p:divider />
+                                
+                                <p:menuitem value="ออกจากระบบ" action="#{authBean.logout}" icon="pi pi-sign-out" 
+                                            update="@all" styleClass="text-red-500 font-bold" />
+                            </p:menuButton>
                         </h:panelGroup>
                     </div>
                 </f:facet>
