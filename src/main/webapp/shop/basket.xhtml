@@ -54,7 +54,7 @@
                             </h:outputText>
                         </span>
                         <p:button value="Continue Shopping" outcome="/shop/shop.xhtml" icon="pi pi-shopping-cart" styleClass="ui-button-secondary mr-2" />
-                        <p:commandButton value="Checkout" type="button" icon="pi pi-check" styleClass="ui-button-success" disabled="#{empty cartBean.cartItems}" />
+                        <p:button value="Checkout" outcome="/shop/payment.xhtml" icon="pi pi-check" styleClass="ui-button-success" disabled="#{empty cartBean.cartItems}" />
                     </div>
                 </h:form>
             </div>

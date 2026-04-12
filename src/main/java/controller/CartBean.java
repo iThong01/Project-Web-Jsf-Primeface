@@ -105,10 +105,8 @@ public class CartBean implements Serializable {
     private Map<Integer, Integer> parseCartCookie(String cookieValue) {
         Map<Integer, Integer> map = new HashMap<>();
         if (cookieValue != null && !cookieValue.isEmpty()) {
-            // Support both old format (,) and new format (_)
             String[] pairs = cookieValue.contains(",") ? cookieValue.split(",") : cookieValue.split("_");
             for (String pair : pairs) {
-                // Support both old format (:) and new format (-)
                 String[] kv = pair.contains(":") ? pair.split(":") : pair.split("-");
                 if (kv.length == 2) {
                     try {
@@ -129,5 +127,12 @@ public class CartBean implements Serializable {
             sb.append(entry.getKey()).append("-").append(entry.getValue());
         }
         return sb.toString();
+    }
+
+    public void clearCart() {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
+        String cookieName = getCartCookieName();
+        CookieUtil.removeCookie(response, cookieName);
     }
 }
