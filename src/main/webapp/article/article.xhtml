@@ -1,20 +1,45 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
+      xmlns:ui="jakarta.faces.facelets"
+      template="/templates/master.xhtml">
 
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
+    <ui:define name="title">
+        Articles - Green Market
+    </ui:define>
 
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
-        
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+    <ui:define name="content">
+        <div class="surface-ground px-4 py-8 md:px-6 lg:px-8">
+            <div class="text-900 font-bold text-4xl mb-6">บทความยอดนิยม</div>
+            
+            <h:panelGroup rendered="#{empty articleBean.articleList}">
+                <div class="text-700 text-xl border-round surface-card p-4 shadow-2 text-center">
+                    <i class="pi pi-file-o text-5xl text-500 mb-3" />
+                    <p>ยังไม่มีบทความในขณะนี้</p>
+                </div>
+            </h:panelGroup>
+
+            <div class="grid">
+                <ui:repeat value="#{articleBean.articleList}" var="article">
+                    <div class="col-12 md:col-6 lg:col-4">
+                        <div class="surface-card shadow-2 p-4 border-round flex flex-column h-full">
+                            <div class="flex align-items-center justify-content-between mb-3">
+                                <span class="text-500 font-medium">#{article.name}</span>
+                                <span class="text-500 font-medium">#{article.date}</span>
+                            </div>
+                            <div class="text-900 font-bold text-2xl mb-3">#{article.head}</div>
+                            <div class="text-700 line-height-3 mb-4 flex-grow-1">#{article.detail}</div>
+                            
+                            <div class="mt-auto">
+                                <p:button value="อ่านเพิ่มเติม" icon="pi pi-arrow-right" iconPos="right" 
+                                          styleClass="ui-button-outlined" />
+                            </div>
+                        </div>
+                    </div>
+                </ui:repeat>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

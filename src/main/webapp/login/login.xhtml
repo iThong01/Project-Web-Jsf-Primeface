@@ -41,7 +41,7 @@
                             <p:selectBooleanCheckbox id="rememberme" value="#{authBean.rememberMe}" styleClass="mr-2" />
                             <label for="rememberme">Remember me</label>
                         </div>
-                        <a class="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer">Forgot your password?</a>
+                        <p:link outcome="forgetpass.xhtml" value="Forgot your password?" styleClass="font-medium no-underline ml-2 text-blue-500 text-right cursor-pointer" />
                     </div>
 
                     <p:commandButton value="Sign In" action="#{authBean.login}" icon="pi pi-user"

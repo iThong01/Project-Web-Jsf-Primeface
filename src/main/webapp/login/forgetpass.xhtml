@@ -1,20 +1,61 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="jakarta.faces.html"
-      xmlns:f="jakarta.faces.core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:ui="jakarta.faces.facelets"
+                template="/templates/master.xhtml">
 
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
+    <ui:define name="title">
+        Forgot Password - Green Market
+    </ui:define>
 
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
-        
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+    <ui:define name="content">
+        <div class="surface-ground px-4 py-8 md:px-6 lg:px-8 flex align-items-center justify-content-center" style="min-height: 70vh;">
+            <div class="surface-card p-4 shadow-2 border-round w-full lg:w-4">
+                <div class="text-center mb-5">
+                    <div class="text-900 text-3xl font-medium mb-3">ลืมรหัสผ่าน</div>
+                    <span class="text-600 font-medium line-height-3">กรอกอีเมลเพื่อค้นหาบัญชีของคุณ</span>
+                </div>
+
+                <h:form id="forgotForm">
+                    <p:messages id="messages" showDetail="true" closable="true" />
+
+                    <h:panelGroup id="searchPanel" rendered="#{authBean.foundUser == null}">
+                        <div class="field mb-4">
+                            <p:outputLabel for="email" value="Email" styleClass="block mb-2" />
+                            <p:inputText id="email" value="#{authBean.emailForForgot}" required="true" 
+                                         placeholder="กรอก Email ที่ใช้สมัคร" styleClass="w-full" />
+                        </div>
+                        <p:commandButton value="ตรวจสอบ Email" action="#{authBean.findUserByEmail}" 
+                                         update="forgotForm" icon="pi pi-search" styleClass="w-full" />
+                    </h:panelGroup>
+
+                    <h:panelGroup id="resetPanel" rendered="#{authBean.foundUser != null}">
+                        <div class="surface-100 p-3 border-round mb-4">
+                            <div class="text-700 font-medium mb-2">Username ของคุณคือ:</div>
+                            <div class="text-900 font-bold text-xl">#{authBean.foundUser.user}</div>
+                        </div>
+
+                        <div class="field mb-4">
+                            <p:outputLabel for="newPass" value="รหัสผ่านใหม่" styleClass="block mb-2" />
+                            <p:password id="newPass" value="#{authBean.newPassword}" required="true" 
+                                        toggleMask="true" placeholder="กรอกรหัสผ่านใหม่" styleClass="w-full" />
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <p:commandButton value="เปลี่ยนรหัสผ่าน" action="#{authBean.updatePassword}" 
+                                             update="forgotForm" icon="pi pi-check" styleClass="flex-grow-1 ui-button-success" />
+                            <p:commandButton value="ยกเลิก" actionListener="#{authBean.setFoundUser(null)}" 
+                                             update="forgotForm" process="@this" styleClass="flex-grow-1 ui-button-secondary" />
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="text-center mt-5">
+                        <p:link outcome="login.xhtml" value="กลับไปหน้าเข้าสู่ระบบ" styleClass="font-medium no-underline text-blue-500" />
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

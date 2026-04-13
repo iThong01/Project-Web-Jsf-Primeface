@@ -1,20 +1,106 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
+      xmlns:ui="jakarta.faces.facelets"
+      template="/templates/master.xhtml">
 
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
+    <ui:define name="title">
+        Manage Articles - Green Market
+    </ui:define>
 
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
-        
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+    <ui:define name="content">
+        <div class="card p-4">
+            <h:form id="form">
+                <p:growl id="messages" showDetail="true" />
+
+                <div class="flex justify-content-between align-items-center mb-4">
+                    <h2 class="m-0">จัดการบทความ</h2>
+                    <p:commandButton value="เพิ่มบทความใหม่" icon="pi pi-plus" 
+                                     oncomplete="PF('articleDialog').show()"
+                                     update=":dialogForm:articleDetail" 
+                                     actionListener="#{articleBean.setNewArticle(null)}"
+                                     styleClass="ui-button-success" />
+                </div>
+
+                <p:dataTable id="dt-articles" widgetVar="dtArticles" var="article" value="#{articleBean.articleList}"
+                             reflow="true" styleClass="products-table" rowKey="#{article.id}" paginator="true" rows="10" 
+                             paginatorPosition="bottom">
+                    
+                    <p:column headerText="ID" sortBy="#{article.id}" style="width: 50px;">
+                        <h:outputText value="#{article.id}" />
+                    </p:column>
+
+                    <p:column headerText="หัวข้อ" sortBy="#{article.head}">
+                        <h:outputText value="#{article.head}" />
+                    </p:column>
+
+                    <p:column headerText="ผู้เขียน" sortBy="#{article.name}">
+                        <h:outputText value="#{article.name}" />
+                    </p:column>
+
+                    <p:column headerText="วันที่" sortBy="#{article.date}">
+                        <h:outputText value="#{article.date}" />
+                    </p:column>
+
+                    <p:column headerText="จัดการ" exportable="false" style="width: 120px;">
+                        <p:commandButton icon="pi pi-pencil" update=":dialogForm:articleDetail"
+                                         oncomplete="PF('articleDialog').show()"
+                                         styleClass="edit-button rounded-button ui-button-warning mr-2" process="@this"
+                                         actionListener="#{articleBean.editArticle(article)}">
+                        </p:commandButton>
+                        <p:commandButton class="ui-button-danger rounded-button" icon="pi pi-trash"
+                                         process="@this" oncomplete="PF('deleteArticleDialog').show()">
+                            <f:setPropertyActionListener value="#{article}" target="#{articleBean.newArticle}" />
+                        </p:commandButton>
+                    </p:column>
+
+                </p:dataTable>
+            </h:form>
+
+            <h:form id="dialogForm">
+                <p:dialog header="รายละเอียดบทความ" showEffect="fade" modal="true" widgetVar="articleDialog"
+                          responsive="true">
+                    <p:outputPanel id="articleDetail" class="ui-fluid">
+                        <p:outputPanel rendered="#{not empty articleBean.newArticle}">
+                            <div class="field mb-3">
+                                <p:outputLabel for="head">หัวข้อ</p:outputLabel>
+                                <p:inputText id="head" value="#{articleBean.newArticle.head}" required="true" />
+                            </div>
+                            <div class="field mb-3">
+                                <p:outputLabel for="name">ชื่อผู้เขียน</p:outputLabel>
+                                <p:inputText id="name" value="#{articleBean.newArticle.name}" required="true" />
+                            </div>
+                            <div class="field mb-3">
+                                <p:outputLabel for="date">วันที่ (เช่น 13/04/2026)</p:outputLabel>
+                                <p:inputText id="date" value="#{articleBean.newArticle.date}" />
+                            </div>
+                            <div class="field mb-3">
+                                <p:outputLabel for="detail">เนื้อหา</p:outputLabel>
+                                <p:inputTextarea id="detail" value="#{articleBean.newArticle.detail}" rows="5" required="true" />
+                            </div>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <f:facet name="footer">
+                        <p:commandButton value="บันทึก" icon="pi pi-check" actionListener="#{articleBean.saveArticle}"
+                                         update="articleDetail :form:dt-articles :form:messages" 
+                                         oncomplete="if (!args.validationFailed) PF('articleDialog').hide()" />
+                        <p:commandButton value="ยกเลิก" icon="pi pi-times" onclick="PF('articleDialog').hide()"
+                                         class="ui-button-secondary" type="button" />
+                    </f:facet>
+                </p:dialog>
+
+                <p:confirmDialog widgetVar="deleteArticleDialog" showEffect="fade" width="300"
+                                 message="คุณแน่ใจหรือไม่ว่าต้องการลบบทความนี้?" header="ยืนยันการลบ" severity="warn">
+                    <p:commandButton value="ใช่" icon="pi pi-check" actionListener="#{articleBean.deleteArticle(articleBean.newArticle)}"
+                                     process="@this" update=":form:dt-articles :form:messages"
+                                     oncomplete="PF('deleteArticleDialog').hide()" />
+                    <p:commandButton value="ไม่" type="button" styleClass="ui-button-secondary" icon="pi pi-times"
+                                     onclick="PF('deleteArticleDialog').hide()" />
+                </p:confirmDialog>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>

@@ -53,6 +53,7 @@ public class JwtFilter implements Filter {
                path.startsWith("/login/") ||
                path.startsWith("/index.xhtml") ||
                path.startsWith("/shop/shop.xhtml") ||
+               path.startsWith("/article/article.xhtml") ||
                path.startsWith("/jakarta.faces.resource") ||
                path.startsWith("/javax.faces.resource");
     }

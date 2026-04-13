@@ -32,8 +32,65 @@ public class AuthBean implements Serializable {
     private String email;
     private String user;
     private String password;
+    private String emailForForgot;
+    private User foundUser;
+    private String newPassword;
 
-    
+    public String getEmailForForgot() {
+        return emailForForgot;
+    }
+
+    public void setEmailForForgot(String emailForForgot) {
+        this.emailForForgot = emailForForgot;
+    }
+
+    public User getFoundUser() {
+        return foundUser;
+    }
+
+    public void setFoundUser(User foundUser) {
+        this.foundUser = foundUser;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
+    }
+
+    public void findUserByEmail() {
+        try {
+            foundUser = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                    .setParameter("email", emailForForgot)
+                    .getSingleResult();
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "พบข้อมูลผู้ใช้", "กรุณาตั้งรหัสผ่านใหม่"));
+        } catch (NoResultException e) {
+            foundUser = null;
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ไม่พบข้อมูล", "ไม่พบผู้ใช้ที่ใช้ Email นี้"));
+        }
+    }
+
+    @Transactional
+    public String updatePassword() {
+        try {
+            if (foundUser != null && newPassword != null && !newPassword.isEmpty()) {
+                User u = em.find(User.class, foundUser.getId());
+                u.setPassword(newPassword);
+                em.merge(u);
+                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "สำเร็จ", "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว"));
+                foundUser = null;
+                emailForForgot = null;
+                newPassword = null;
+                return "/login/login.xhtml?faces-redirect=true";
+            }
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ผิดพลาด", "ไม่สามารถเปลี่ยนรหัสผ่านได้"));
+        }
+        return null;
+    }
+
     public String getFirstName() {
         return firstName;
     }
