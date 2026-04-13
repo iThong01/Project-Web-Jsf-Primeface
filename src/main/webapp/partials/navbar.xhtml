@@ -20,7 +20,11 @@
 
                         <div class="ui-input-icon-left">
                             <i class="pi pi-fw pi-search" />
-                            <p:inputText placeholder="Search" />
+                            <p:autoComplete value="#{productBean.searchKeyword}"
+                                            completeMethod="#{productBean.completeProduct}"
+                                            placeholder="Search">
+                                <p:ajax event="itemSelect" listener="#{productBean.onProductSelect}" />
+                            </p:autoComplete>
                         </div>
                         <h:panelGroup rendered="#{authBean.loggedIn}">
                         <p:button icon="pi pi-shopping-cart" outcome="/shop/basket.xhtml"

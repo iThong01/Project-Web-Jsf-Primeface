@@ -26,6 +26,65 @@ public class ProductBean implements Serializable {
     private List<Product> productList;
     private Product newProduct = new Product();
     private UploadedFile uploadedImage;
+    private String searchKeyword;
+    private String searchQuery;
+    private List<Product> searchResultList;
+
+    public String getSearchQuery() {
+        return searchQuery;
+    }
+
+    public void setSearchQuery(String searchQuery) {
+        this.searchQuery = searchQuery;
+    }
+
+    public List<Product> getSearchResultList() {
+        return searchResultList;
+    }
+
+    public void setSearchResultList(List<Product> searchResultList) {
+        this.searchResultList = searchResultList;
+    }
+
+    public void loadSearchResults() {
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            searchResultList = em.createQuery("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(:query)", Product.class)
+                                 .setParameter("query", "%" + searchQuery.trim() + "%")
+                                 .getResultList();
+        } else {
+            searchResultList = new java.util.ArrayList<>();
+        }
+    }
+
+    public String getSearchKeyword() {
+        return searchKeyword;
+    }
+
+    public void setSearchKeyword(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
+    }
+
+    public List<String> completeProduct(String query) {
+        String queryLowerCase = query.toLowerCase();
+        List<String> suggestions = new java.util.ArrayList<>();
+        if (productList != null) {
+            for (Product product : productList) {
+                if (product.getName().toLowerCase().contains(queryLowerCase)) {
+                    suggestions.add(product.getName());
+                }
+            }
+        }
+        return suggestions;
+    }
+
+    public void onProductSelect(org.primefaces.event.SelectEvent<String> event) {
+        try {
+            String selectedName = event.getObject();
+            FacesContext.getCurrentInstance().getExternalContext().redirect(FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath() + "/shop/search.xhtml?query=" + java.net.URLEncoder.encode(selectedName, "UTF-8"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     public List<Product> getProductList() {
         return productList;

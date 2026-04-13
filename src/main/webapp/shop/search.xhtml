@@ -1,20 +1,57 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="jakarta.faces.html"
       xmlns:f="jakarta.faces.core"
       xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="jakarta.faces.facelets">
+      xmlns:ui="jakarta.faces.facelets"
+      template="/templates/master.xhtml">
 
-    <h:head>
-        <title>Green Market Admin</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <h:outputStylesheet library="webjars" name="primeflex/3.3.1/primeflex.min.css" />
-        <h:outputScript name="js/primeblocks.js" />
-    </h:head>
+    <ui:define name="title">
+        Search Results - Green Market
+    </ui:define>
 
-    <h:body>
-        <ui:include src="partials/navbar.xhtml" />
+    <ui:define name="content">
+        <f:metadata>
+            <f:viewParam name="query" value="#{productBean.searchQuery}" />
+            <f:viewAction action="#{productBean.loadSearchResults}" />
+        </f:metadata>
         
-        <ui:include src="partials/footer.xhtml" />
-    </h:body>
-</html>
+        <div class="surface-ground px-4 py-8 md:px-6 lg:px-8">
+            <div class="text-900 font-bold text-4xl mb-4">ผลการค้นหาสำหรับ: "#{productBean.searchQuery}"</div>
+            
+            <h:panelGroup rendered="#{empty productBean.searchResultList}">
+                <div class="text-700 text-xl border-round surface-card p-4 shadow-2 text-center">
+                    <i class="pi pi-search text-5xl text-500 mb-3" />
+                    <p>ไม่พบสินค้าที่ตรงกับคำค้นหาของคุณ</p>
+                </div>
+            </h:panelGroup>
+
+            <h:form id="searchResultForm">
+                <div class="grid">
+                    <ui:repeat value="#{productBean.searchResultList}" var="product">
+                        <div class="col-12 md:col-6 lg:col-3">
+                            <div class="surface-card shadow-2 p-3 border-round flex flex-column h-full">
+                                <div class="flex flex-column align-items-center mb-3 flex-grow-1">
+                                    <h:panelGroup rendered="#{not empty product.base64Image}">
+                                        <img src="data:image/jpeg;base64,#{product.base64Image}" alt="#{product.name}" style="width: 100%; height: 200px; object-fit: cover;" class="border-round" />
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{empty product.base64Image}">
+                                        <div class="flex align-items-center justify-content-center bg-gray-200 border-round" style="width: 100%; height: 200px;">
+                                            <i class="pi pi-image text-500 text-6xl"></i>
+                                        </div>
+                                    </h:panelGroup>
+                                </div>
+                                <div class="text-2xl font-bold mb-2">#{product.name}</div>
+                                <div class="text-700 mb-3 flex-grow-1">#{product.description}</div>
+                                <div class="flex align-items-center justify-content-between mt-auto">
+                                    <span class="text-2xl font-bold text-900">฿#{product.price}</span>
+                                    <p:commandButton icon="pi pi-shopping-cart" title="เพิ่มลงตะกร้า" styleClass="ui-button-success ui-button-rounded" />
+                                </div>
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </h:form>
+        </div>
+    </ui:define>
+
+</ui:composition>
