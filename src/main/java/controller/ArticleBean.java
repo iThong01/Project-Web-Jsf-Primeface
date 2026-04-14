@@ -1,14 +1,13 @@
 package controller;
 
 import com.greenmarket.entity.Article;
+import com.greenmarket.service.ArticleService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,8 +15,8 @@ import java.util.List;
 @ViewScoped
 public class ArticleBean implements Serializable {
 
-    @PersistenceContext(unitName = "GreenMarketDB")
-    private EntityManager em;
+    @Inject
+    private ArticleService articleService;
 
     private List<Article> articleList;
     private Article newArticle = new Article();
@@ -28,19 +27,16 @@ public class ArticleBean implements Serializable {
     }
 
     public void loadArticles() {
-        articleList = em.createQuery("SELECT a FROM Article a ORDER BY a.id DESC", Article.class).getResultList();
+        articleList = articleService.getAllArticles();
     }
 
-    @Transactional
     public void saveArticle() {
         try {
-            if (newArticle.getId() == null) {
-                em.persist(newArticle);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("เพิ่มบทความเรียบร้อย"));
-            } else {
-                em.merge(newArticle);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("แก้ไขบทความเรียบร้อย"));
-            }
+            articleService.saveOrUpdateArticle(newArticle);
+            
+            String msg = (newArticle.getId() == null) ? "เพิ่มบทความเรียบร้อย" : "แก้ไขบทความเรียบร้อย";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg));
+            
             newArticle = new Article();
             loadArticles();
         } catch (Exception e) {
@@ -52,33 +48,19 @@ public class ArticleBean implements Serializable {
         this.newArticle = article;
     }
 
-    @Transactional
     public void deleteArticle(Article article) {
         try {
-            Article a = em.find(Article.class, article.getId());
-            if (a != null) {
-                em.remove(a);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบบทความเรียบร้อย"));
-                loadArticles();
-            }
+            articleService.deleteArticle(article.getId());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบบทความเรียบร้อย"));
+            loadArticles();
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
         }
     }
 
-    public List<Article> getArticleList() {
-        return articleList;
-    }
-
-    public void setArticleList(List<Article> articleList) {
-        this.articleList = articleList;
-    }
-
-    public Article getNewArticle() {
-        return newArticle;
-    }
-
-    public void setNewArticle(Article newArticle) {
-        this.newArticle = newArticle;
-    }
+    // Getters and Setters
+    public List<Article> getArticleList() { return articleList; }
+    public void setArticleList(List<Article> articleList) { this.articleList = articleList; }
+    public Article getNewArticle() { return newArticle; }
+    public void setNewArticle(Article newArticle) { this.newArticle = newArticle; }
 }
