@@ -1,20 +1,20 @@
 package controller;
 
 import com.greenmarket.entity.User;
+import com.greenmarket.service.UserService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.NoResultException;
-import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.Serializable;
 import java.util.Date;
-import jakarta.transaction.Transactional;
+import jakarta.inject.Inject;
+import jakarta.security.enterprise.SecurityContext;
+import jakarta.security.enterprise.AuthenticationStatus;
+import jakarta.security.enterprise.credential.UsernamePasswordCredential;
+import jakarta.security.enterprise.authentication.mechanism.http.AuthenticationParameters;
 
 import com.greenmarket.util.CookieUtil;
 import com.greenmarket.util.JwtUtil;
@@ -22,8 +22,13 @@ import com.greenmarket.util.JwtUtil;
 @Named(value = "authBean")
 @SessionScoped
 public class AuthBean implements Serializable {
-    @PersistenceContext(unitName = "GreenMarketDB")
-    private EntityManager em;
+
+    @Inject
+    private UserService userService;
+
+    @Inject
+    private SecurityContext securityContext;
+
     private boolean rememberMe;
     private User currentUser;
     private String firstName;
@@ -32,61 +37,123 @@ public class AuthBean implements Serializable {
     private String email;
     private String user;
     private String password;
+
     private String emailForForgot;
     private User foundUser;
     private String newPassword;
 
-    public String getEmailForForgot() {
-        return emailForForgot;
+    public boolean isLoggedIn() {
+        return getCurrentUser() != null;
     }
 
-    public void setEmailForForgot(String emailForForgot) {
-        this.emailForForgot = emailForForgot;
+    public User getCurrentUser() {
+        if (currentUser == null) {
+            String username = securityContext.getCallerPrincipal() != null
+                    ? securityContext.getCallerPrincipal().getName()
+                    : null;
+            if (username != null) {
+                currentUser = userService.getUserByUsername(username);
+            }
+        }
+        return currentUser;
     }
 
-    public User getFoundUser() {
-        return foundUser;
-    }
+    public String login() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+        HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
 
-    public void setFoundUser(User foundUser) {
-        this.foundUser = foundUser;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
-
-    public void findUserByEmail() {
         try {
-            foundUser = em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-                    .setParameter("email", emailForForgot)
-                    .getSingleResult();
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "พบข้อมูลผู้ใช้", "กรุณาตั้งรหัสผ่านใหม่"));
-        } catch (NoResultException e) {
-            foundUser = null;
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ไม่พบข้อมูล", "ไม่พบผู้ใช้ที่ใช้ Email นี้"));
+            AuthenticationStatus status = securityContext.authenticate(
+                    request, response,
+                    AuthenticationParameters.withParams().credential(new UsernamePasswordCredential(user, password)));
+
+            if (status == AuthenticationStatus.SUCCESS) {
+                User userObj = userService.getUserByUsername(user);
+                if (userObj != null) {
+                    String token = JwtUtil.generateToken(userObj.getUser(), userObj.getRole());
+                    CookieUtil.addCookie(response, "AUTH_TOKEN", token, 60 * 60 * 24, true);
+
+                    this.currentUser = userObj;
+                    if (rememberMe) {
+                        CookieUtil.addCookie(response, "remember_user", user, 60 * 60 * 24 * 10, true);
+                    } else {
+                        CookieUtil.removeCookie(response, "remember_user");
+                    }
+                    if ("admin".equals(userObj.getRole())) {
+                        return "/shop/manage.xhtml?faces-redirect=true";
+                    }
+                    return "/index.xhtml?faces-redirect=true";
+                }
+            } else if (status == AuthenticationStatus.SEND_FAILURE || status == AuthenticationStatus.NOT_DONE) {
+                context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed",
+                        "Username หรือรหัสผ่านไม่ถูกต้อง"));
+                return null;
+            }
+        } catch (Exception e) {
+            context.addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "เกิดข้อผิดพลาด: " + e.getMessage()));
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public String logout() {
+        this.currentUser = null;
+        this.user = null;
+        this.password = null;
+        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext()
+                .getResponse();
+        CookieUtil.removeCookie(response, "AUTH_TOKEN");
+        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+        return "/index.xhtml?faces-redirect=true";
+    }
+
+    public String register() {
+        try {
+            User newUser = new User();
+            newUser.setName(this.firstName);
+            newUser.setLname(this.lastName);
+            newUser.setEmail(this.email);
+            newUser.setUser(this.user);
+            newUser.setPassword(this.password);
+
+            userService.register(newUser);
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "Success", "สมัครเรียบร้อย"));
+            return "/login/login.xhtml?faces-redirect=true";
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Register Fail", "สมัครไม่สำเร็จ"));
+            return null;
         }
     }
 
-    @Transactional
+    public void findUserByEmail() {
+        foundUser = userService.getUserByEmail(emailForForgot);
+        if (foundUser != null) {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_INFO, "พบข้อมูลผู้ใช้", "กรุณาตั้งรหัสผ่านใหม่"));
+        } else {
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ไม่พบข้อมูล", "ไม่พบผู้ใช้ที่ใช้ Email นี้"));
+        }
+    }
+
     public String updatePassword() {
         try {
             if (foundUser != null && newPassword != null && !newPassword.isEmpty()) {
-                User u = em.find(User.class, foundUser.getId());
-                u.setPassword(newPassword);
-                em.merge(u);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "สำเร็จ", "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว"));
+                userService.updatePassword(foundUser.getId(), newPassword);
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "สำเร็จ", "เปลี่ยนรหัสผ่านเรียบร้อยแล้ว"));
                 foundUser = null;
                 emailForForgot = null;
                 newPassword = null;
                 return "/login/login.xhtml?faces-redirect=true";
             }
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "ผิดพลาด", "ไม่สามารถเปลี่ยนรหัสผ่านได้"));
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "ผิดพลาด", "ไม่สามารถเปลี่ยนรหัสผ่านได้"));
         }
         return null;
     }
@@ -115,15 +182,11 @@ public class AuthBean implements Serializable {
         this.birthDay = birthDay;
     }
 
-    public boolean isLoggedIn() {
-        return currentUser != null;
-    }
-
-    public String getEmail(){
+    public String getEmail() {
         return email;
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -151,103 +214,31 @@ public class AuthBean implements Serializable {
         this.rememberMe = rememberMe;
     }
 
-    public User getCurrentUser() {
-        if (currentUser == null) {
-            try {
-                HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-                if (request != null) {
-                    String token = CookieUtil.getCookieValue(request, "AUTH_TOKEN");
-                    if (token != null && !token.isEmpty()) {
-                        var claims = JwtUtil.validateToken(token);
-                        String username = claims.getSubject();
-                        if (username != null) {
-                            currentUser = em.createQuery("SELECT u FROM User u WHERE u.user = :user", User.class)
-                                    .setParameter("user", username)
-                                    .getSingleResult();
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                // Token invalid or expired, currentUser remains null
-            }
-        }
-        return currentUser;
-    }
-
     public void setCurrentUser(User currentUser) {
         this.currentUser = currentUser;
     }
 
-    public String login() {
-        try {
-            User userObj = em
-                    .createQuery("SELECT u FROM User u WHERE u.user = :user AND u.password = :password", User.class)
-                    .setParameter("user", user)
-                    .setParameter("password", password)
-                    .getSingleResult();
-
-            String token = JwtUtil.generateToken(userObj.getUser(), userObj.getRole());
-            HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-            CookieUtil.addCookie(response, "AUTH_TOKEN", token, 60*60*24, true);
-
-            this.currentUser = userObj;
-            if (rememberMe) CookieUtil.addCookie(response, "remember_user", user, 60*60*24*10, false);
-            else CookieUtil.removeCookie(response, "remember_user");
-           
-            return "/index.xhtml?faces-redirect=true";
-        } catch (NoResultException e) {
-            FacesContext.getCurrentInstance().addMessage(null,
-                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Login Failed", "Username หรือรหัสผ่านไม่ถูกต้อง"));
-    
-            return null;
-        }
-    }
-    
-    private void handleRememberMeCookie() {
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-    
-        if (rememberMe) {
-            Cookie userCookie = new Cookie("remember_user", currentUser.getUser());
-            userCookie.setMaxAge(60 * 60 * 24 * 10);
-            userCookie.setPath("/");
-            response.addCookie(userCookie);
-        } else {
-            Cookie userCookie = new Cookie("remember_user", "");
-            userCookie.setMaxAge(0);
-            userCookie.setPath("/");
-            response.addCookie(userCookie);
-        }
-    }
-    
-    public String logout() {
-        this.currentUser = null;
-        this.user = null;
-        this.password = null;
-        HttpServletResponse response = (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
-
-        CookieUtil.removeCookie(response, "AUTH_TOKEN");
-        FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
-        return "/index.xhtml?faces-redirect=true";
+    public String getEmailForForgot() {
+        return emailForForgot;
     }
 
-    @jakarta.transaction.Transactional
-    public String register(){
-        try{
-            User newUser = new User();
-            newUser.setName(this.firstName);
-            newUser.setLname(this.lastName);
-            newUser.setEmail(this.email);
-            newUser.setUser(this.user);
-            newUser.setPassword(this.password);
-            newUser.setRole("customer");
+    public void setEmailForForgot(String emailForForgot) {
+        this.emailForForgot = emailForForgot;
+    }
 
-            em.persist(newUser);
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,"Success","สมัครเรียบร้อย"));
-            return "/login/login.xhtml?faces-redirect=true";
-        }catch(Exception e){
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Register Fail","สมัครไม่สำเร็จ"));
-            return null;
-        }
+    public User getFoundUser() {
+        return foundUser;
+    }
+
+    public void setFoundUser(User foundUser) {
+        this.foundUser = foundUser;
+    }
+
+    public String getNewPassword() {
+        return newPassword;
+    }
+
+    public void setNewPassword(String newPassword) {
+        this.newPassword = newPassword;
     }
 }

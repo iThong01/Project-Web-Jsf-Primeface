@@ -27,12 +27,12 @@
                 <div>
                     <span class="ui-float-label">
                          <p:inputText id="username" value="#{authBean.user}" required="true" 
-                                      requiredMessage="กรุณากรอก Username" />
+                                      styleClass="w-full" requiredMessage="กรุณากรอก Username" />
                          <p:outputLabel for="@previous" value="Username"/>
                     </span>
                     <span class="ui-float-label mt-5 mb-5">
                          <p:password id="password" value="#{authBean.password}" required="true" toggleMask="true" redisplay="true"
-                                      requiredMessage="กรุณากรอก Password" />
+                                      styleClass="w-full" requiredMessage="กรุณากรอก Password" />
                          <p:outputLabel for="@previous" value="Password"/>
                     </span>
 
@@ -45,7 +45,7 @@
                     </div>
 
                     <p:commandButton value="Sign In" action="#{authBean.login}" icon="pi pi-user"
-                        styleClass="w-full" />
+                        styleClass="w-full" ajax="false" />
 
                 </div>
             </h:form>

@@ -1,19 +1,14 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package controller;
 
 import com.greenmarket.entity.Product;
+import com.greenmarket.service.ProductService;
 import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.transaction.Transactional;
+import java.io.Serializable;
 import java.util.List;
 import jakarta.annotation.PostConstruct;
 import org.primefaces.model.file.UploadedFile;
-import java.io.Serializable;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 
@@ -21,8 +16,9 @@ import jakarta.faces.context.FacesContext;
 @ViewScoped
 public class ProductBean implements Serializable {
 
-    @PersistenceContext(unitName = "GreenMarketDB")
-    private EntityManager em;
+    @Inject
+    private ProductService productService;
+
     private List<Product> productList;
     private Product newProduct = new Product();
     private UploadedFile uploadedImage;
@@ -30,38 +26,47 @@ public class ProductBean implements Serializable {
     private String searchQuery;
     private List<Product> searchResultList;
 
-    public String getSearchQuery() {
-        return searchQuery;
+    @PostConstruct
+    public void init() {
+        loadProducts();
     }
 
-    public void setSearchQuery(String searchQuery) {
-        this.searchQuery = searchQuery;
-    }
-
-    public List<Product> getSearchResultList() {
-        return searchResultList;
-    }
-
-    public void setSearchResultList(List<Product> searchResultList) {
-        this.searchResultList = searchResultList;
+    public void loadProducts() {
+        productList = productService.getAllProducts();
     }
 
     public void loadSearchResults() {
-        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
-            searchResultList = em.createQuery("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(:query)", Product.class)
-                                 .setParameter("query", "%" + searchQuery.trim() + "%")
-                                 .getResultList();
-        } else {
-            searchResultList = new java.util.ArrayList<>();
+        searchResultList = productService.searchProducts(searchQuery);
+    }
+
+    public void saveProduct() {
+        try {
+            byte[] imageBytes = (uploadedImage != null) ? uploadedImage.getContent() : null;
+            productService.saveOrUpdateProduct(newProduct, imageBytes);
+            
+            String msg = (newProduct.getId() == null) ? "เพิ่มสินค้าเรียบร้อย" : "แก้ไขสินค้าเรียบร้อย";
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg));
+            
+            newProduct = new Product();
+            uploadedImage = null;
+            loadProducts();
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
         }
     }
 
-    public String getSearchKeyword() {
-        return searchKeyword;
+    public void deleteProduct(Product product) {
+        try {
+            productService.deleteProduct(product.getId());
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบสินค้าเรียบร้อย"));
+            loadProducts();
+        } catch (Exception e) {
+            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาดในการลบ", e.getMessage()));
+        }
     }
 
-    public void setSearchKeyword(String searchKeyword) {
-        this.searchKeyword = searchKeyword;
+    public void editProduct(Product product) {
+        this.newProduct = product;
     }
 
     public List<String> completeProduct(String query) {
@@ -86,78 +91,17 @@ public class ProductBean implements Serializable {
         }
     }
 
-    public List<Product> getProductList() {
-        return productList;
-    }
-
-    public void setProductList(List<Product> productList) {
-        this.productList = productList;
-    }
-
-    public Product getNewProduct() {
-        return newProduct;
-    }
-
-    public void setNewProduct(Product newProduct) {
-        this.newProduct = newProduct;
-    }
-
-    public UploadedFile getUploadedImage() {
-        return uploadedImage;
-    }
-
-    public void setUploadedImage(UploadedFile uploadedImage) {
-        this.uploadedImage = uploadedImage;
-    }
-    
-    @PostConstruct
-    public void init() {
-        loadProducts();
-    }
-
-    public void loadProducts() {
-        productList = em.createQuery("SELECT p FROM Product p", Product.class).getResultList();
-    }
-
-    @Transactional
-    public void saveProduct() {
-        try {
-            if (uploadedImage != null && uploadedImage.getSize() > 0) {
-                newProduct.setImage(uploadedImage.getContent());
-            }
-            if (newProduct.getId() == null) {
-                em.persist(newProduct);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("เพิ่มสินค้าเรียบร้อย"));
-            } else {
-                em.merge(newProduct);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("แก้ไขสินค้าเรียบร้อย"));
-            }
-            newProduct = new Product();
-            uploadedImage = null;
-            loadProducts();
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
-            System.err.println("Error saving product : " + e.getMessage());
-        }
-    }
-
-    public void editProduct(Product product) {
-        this.newProduct = product;
-        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "แก้ไข", "กำลังแก้ไขสินค้า: " + product.getName()));
-    }
-
-    @Transactional
-    public void deleteProduct(Product product) {
-        try {
-            Product p = em.find(Product.class, product.getId());
-            if (p != null) {
-                em.remove(p);
-                FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบสินค้าเรียบร้อย"));
-                loadProducts();
-            }
-        } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาดในการลบ", e.getMessage()));
-            System.err.println("Error deleting product : " + e.getMessage());
-        }
-    }
+    // Getters and Setters
+    public List<Product> getProductList() { return productList; }
+    public void setProductList(List<Product> productList) { this.productList = productList; }
+    public Product getNewProduct() { return newProduct; }
+    public void setNewProduct(Product newProduct) { this.newProduct = newProduct; }
+    public UploadedFile getUploadedImage() { return uploadedImage; }
+    public void setUploadedImage(UploadedFile uploadedImage) { this.uploadedImage = uploadedImage; }
+    public String getSearchKeyword() { return searchKeyword; }
+    public void setSearchKeyword(String searchKeyword) { this.searchKeyword = searchKeyword; }
+    public String getSearchQuery() { return searchQuery; }
+    public void setSearchQuery(String searchQuery) { this.searchQuery = searchQuery; }
+    public List<Product> getSearchResultList() { return searchResultList; }
+    public void setSearchResultList(List<Product> searchResultList) { this.searchResultList = searchResultList; }
 }
