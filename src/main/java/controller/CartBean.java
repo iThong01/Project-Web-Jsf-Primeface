@@ -30,6 +30,16 @@ public class CartBean implements Serializable {
     @Inject
     private AuthBean authBean;
 
+    private Map<Integer, Integer> quantityMap = new HashMap<>();
+
+    public Map<Integer, Integer> getQuantityMap() {
+        return quantityMap;
+    }
+
+    public void setQuantityMap(Map<Integer, Integer> quantityMap) {
+        this.quantityMap = quantityMap;
+    }
+
     private static final String BASE_CART_COOKIE_NAME = "SHOPPING_CART";
 
     private String getCartCookieName() {
@@ -48,13 +58,16 @@ public class CartBean implements Serializable {
         String cartCookie = CookieUtil.getCookieValue(request, cookieName);
         Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
 
-        cartMap.put(productId, cartMap.getOrDefault(productId, 0) + 1);
+        int qtyToAdd = quantityMap.getOrDefault(productId, 1);
+        cartMap.put(productId, cartMap.getOrDefault(productId, 0) + qtyToAdd);
 
         String newCartStr = buildCartCookieString(cartMap);
 
         CookieUtil.addCookie(response, cookieName, newCartStr, 60 * 60 * 24 * 7, false);
 
-        externalContext.redirect(externalContext.getRequestContextPath() + "/shop/basket.xhtml");
+        FacesContext.getCurrentInstance().addMessage(null, 
+            new jakarta.faces.application.FacesMessage(jakarta.faces.application.FacesMessage.SEVERITY_INFO, 
+                "Success", "Added " + qtyToAdd + " item(s) to cart"));
     }
 
     public void removeFromCart(Integer productId) {

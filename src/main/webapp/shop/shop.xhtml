@@ -35,6 +35,7 @@
                 </h:form>
 
                 <h:form id="form">
+                    <p:growl id="messages" showDetail="true" />
                     <p:dataView var="p" value="#{productBean.productList}" rows="12" paginator="true" paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} 
                                 {PageLinks} {NextPageLink} {LastPageLink}" gridIcon="pi pi-th-large"
                         listIcon="pi pi-bars" layout="grid" gridRowStyleClass="lg:col-6 xl:col-4" flex="true">
@@ -69,9 +70,11 @@
                                     <h:outputText value="$#{p.price}" styleClass="text-2xl font-semibold">
                                         <f:convertNumber pattern="#0.00" />
                                     </h:outputText>
-                                    <p:commandButton action="#{cartBean.addToCart(p.id)}" ajax="false" value="Add" icon="pi pi-shopping-cart"
-                                        rendered="#{authBean.loggedIn}"
-                                        disabled="#{p.count == 0 }" styleClass="ui-button-success" />
+                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center gap-2">
+                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}" disabled="#{p.count == 0}" style="width: 5rem;" />
+                                        <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" value="Add" icon="pi pi-shopping-cart"
+                                            disabled="#{p.count == 0 }" styleClass="ui-button-success" />
+                                    </h:panelGroup>
                                 </div>
                             </div>
                         </p:dataViewGridItem>
@@ -101,8 +104,11 @@
                                     <span class="#{p.count > 0 ? 'text-green-500' : 'text-red-500'} font-bold mb-3">
                                         #{p.count > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                                     </span>
-                                    <p:commandButton action="#{cartBean.addToCart(p.id)}" ajax="false" rendered="#{authBean.loggedIn}"  value="Add to Cart" icon="pi pi-shopping-cart"
-                                        disabled="#{p.count == 0}" styleClass="ui-button-success" />
+                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center gap-2 mb-2">
+                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}" disabled="#{p.count == 0}" style="width: 5rem;" />
+                                        <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" value="Add" icon="pi pi-shopping-cart"
+                                            disabled="#{p.count == 0}" styleClass="ui-button-success" />
+                                    </h:panelGroup>
                                     <p:button value="Login to Shop" icon="pi pi-sign-in"
                                             rendered="#{not authBean.loggedIn}" 
                                             outcome="/login/login.xhtml" />
