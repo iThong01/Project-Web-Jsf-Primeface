@@ -15,7 +15,7 @@ public static void addCookie(HttpServletResponse res,
     cookie.setMaxAge(maxAge);
     cookie.setHttpOnly(httpOnly);
     cookie.setSecure(isSecureEnvironment());
-    cookie.setAttribute("SameSite", "Strict");
+    // cookie.setAttribute("SameSite", "Strict");
     res.addCookie(cookie);
 }
 
@@ -24,7 +24,7 @@ public static void removeCookie(HttpServletResponse res, String name) {
     cookie.setPath("/");
     cookie.setMaxAge(0);
     cookie.setHttpOnly(true);
-    cookie.setAttribute("SameSite", "Strict");
+    // cookie.setAttribute("SameSite", "Strict");
     res.addCookie(cookie);
 }
     public static String getCookieValue(HttpServletRequest req, String name) {

@@ -39,7 +39,6 @@
                         
                         <p:column headerText="Action" style="width: 100px; text-align: center;">
                             <p:commandButton action="#{cartBean.removeFromCart(item.product.id)}" 
-                                             ajax="false"
                                              icon="pi pi-trash" 
                                              styleClass="ui-button-danger rounded-button ui-button-flat" />
                         </p:column>
@@ -49,7 +48,7 @@
                     <div class="flex justify-content-end align-items-center">
                         <span class="text-xl font-bold mr-4 text-primary">
                             Total Price: 
-                            <h:outputText value="$#{cartBean.totalPrice}">
+                            <h:outputText value="#{cartBean.totalPrice}">
                                 <f:convertNumber pattern="#0.00" />
                             </h:outputText>
                         </span>

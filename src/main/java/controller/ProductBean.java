@@ -91,7 +91,6 @@ public class ProductBean implements Serializable {
         }
     }
 
-    // Getters and Setters
     public List<Product> getProductList() { return productList; }
     public void setProductList(List<Product> productList) { this.productList = productList; }
     public Product getNewProduct() { return newProduct; }

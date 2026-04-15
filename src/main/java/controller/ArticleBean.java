@@ -33,14 +33,15 @@ public class ArticleBean implements Serializable {
     public void saveArticle() {
         try {
             articleService.saveOrUpdateArticle(newArticle);
-            
+
             String msg = (newArticle.getId() == null) ? "เพิ่มบทความเรียบร้อย" : "แก้ไขบทความเรียบร้อย";
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(msg));
-            
+
             newArticle = new Article();
             loadArticles();
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
         }
     }
 
@@ -54,13 +55,24 @@ public class ArticleBean implements Serializable {
             FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("ลบบทความเรียบร้อย"));
             loadArticles();
         } catch (Exception e) {
-            FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "เกิดข้อผิดพลาด", e.getMessage()));
         }
     }
 
-    // Getters and Setters
-    public List<Article> getArticleList() { return articleList; }
-    public void setArticleList(List<Article> articleList) { this.articleList = articleList; }
-    public Article getNewArticle() { return newArticle; }
-    public void setNewArticle(Article newArticle) { this.newArticle = newArticle; }
+    public List<Article> getArticleList() {
+        return articleList;
+    }
+
+    public void setArticleList(List<Article> articleList) {
+        this.articleList = articleList;
+    }
+
+    public Article getNewArticle() {
+        return newArticle;
+    }
+
+    public void setNewArticle(Article newArticle) {
+        this.newArticle = newArticle;
+    }
 }

@@ -27,40 +27,47 @@
                 life.</div>
 
             <h:form id="productForm">
-                <p:carousel value="#{productBean.productList}" var="p" numVisible="3" numScroll="1" circular="true" autoplayInterval="4000">
-                    
-                            <div class="p-3 h-full">
-                                <div class="shadow-2 p-3 h-full flex flex-column surface-card" style="border-radius: 6px">
-                                    <h:panelGroup rendered="#{not empty p.base64Image}">
-                                        <div class="flex justify-content-center w-full mb-3">
-                                        <img src="data:image/jpeg;base64,#{p.base64Image}"
-                                             style="width: 200px; height: 200px; object-fit: cover; border-radius: 6px; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);" class="mb-3 align-items-center" />
-                                             </div>
-                                    </h:panelGroup>
-                                    <div class="text-900 font-medium text-xl mb-2 text-center" >
-                                        <h:outputText value="#{p.name}" />
-                                    </div>
-                                    <div class="text-600 mb-3 text-center" style="min-height: 3rem;">
-                                        <h:outputText value="#{p.description}" />
-                                    </div>
+                <p:carousel value="#{productBean.productList}" var="p" numVisible="3" numScroll="1" circular="true"
+                    autoplayInterval="4000">
 
-                                    <hr class="my-3 mx-0 border-top-1 border-bottom-none surface-border" />
-
-                                    <div class="flex align-items-center justify-content-center">
-                                        <span class="font-bold text-2xl text-900">
-                                            <h:outputText value="$#{p.price}">
-                                                <f:convertNumber pattern="#0.00" />
-                                            </h:outputText>
-                                        </span>
-                                    </div>
-
-                                    <hr class="mb-3 mx-0 border-top-1 border-bottom-none surface-border mt-auto" />
-
-                                    <p:commandButton action="#{cartBean.addToCart(p.id)}" ajax="false" value="Add to Cart" icon="pi pi-shopping-cart"
-                                        rendered="#{authBean.loggedIn}"
-                                        styleClass="px-3 py-2 w-full mt-auto ui-button-success" />
+                    <div class="p-3 h-full">
+                        <div class="shadow-2 p-3 h-full flex flex-column surface-card" style="border-radius: 6px">
+                            <h:panelGroup rendered="#{not empty p.base64Image}">
+                                <div class="flex justify-content-center w-full mb-3">
+                                    <img src="data:image/jpeg;base64,#{p.base64Image}"
+                                        style="width: 200px; height: 200px; object-fit: cover; border-radius: 6px; box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);"
+                                        class="mb-3 align-items-center" />
                                 </div>
+                            </h:panelGroup>
+                            <div class="text-900 font-medium text-xl mb-2 text-center">
+                                <h:outputText value="#{p.name}" />
                             </div>
+                            <div class="text-600 mb-3 text-center" style="min-height: 3rem;">
+                                <h:outputText value="#{p.description}" />
+                            </div>
+
+                            <hr class="my-3 mx-0 border-top-1 border-bottom-none surface-border" />
+
+                            <div class="flex align-items-center justify-content-center">
+                                <span class="font-bold text-2xl text-900">
+                                    <h:outputText value="$#{p.price}">
+                                        <f:convertNumber pattern="#0.00" />
+                                    </h:outputText>
+                                </span>
+                            </div>
+
+                            <hr class="mb-3 mx-0 border-top-1 border-bottom-none surface-border mt-auto" />
+                            <p:growl id="growl" life="3000" />
+                            <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center justify-content-end gap-2 mb-2">
+                                <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}"
+                                    disabled="#{p.count == 0}" style="width: 5rem;" />
+                                <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" process="@form"
+                                    value="Add" icon="pi pi-shopping-cart" disabled="#{p.count == 0}"
+                                    styleClass="ui-button-success" />
+                            </h:panelGroup>
+                            
+                        </div>
+                    </div>
                 </p:carousel>
             </h:form>
         </div>

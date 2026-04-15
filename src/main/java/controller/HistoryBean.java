@@ -14,11 +14,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * HistoryBean is responsible for loading and displaying the user's order history.
- * Best Practice: Use @ViewScoped for pages that require keeping state across 
- * multiple AJAX requests on the same page (like expanding rows or sorting tables).
- */
 @Named(value = "historyBean")
 @ViewScoped
 public class HistoryBean implements Serializable {
@@ -31,7 +26,6 @@ public class HistoryBean implements Serializable {
 
     private List<Transaction> transactions;
     
-    // Properties for Dialog View
     private Transaction selectedTransaction;
     private List<OrderItem> selectedOrderItems;
 
