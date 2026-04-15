@@ -77,15 +77,24 @@ public class CartBean implements Serializable {
         return BASE_CART_COOKIE_NAME;
     }
 
+    private Map<Integer, Integer> currentCartMap;
+
+    private Map<Integer, Integer> getCartMap() {
+        if (currentCartMap == null) {
+            String cookieName = getCartCookieName();
+            String cartCookie = CookieUtil.getCookieValue(getRequest(), cookieName);
+            currentCartMap = parseCartCookie(cartCookie);
+        }
+        return currentCartMap;
+    }
+
     private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
         FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
 
     public void addToCart(Integer productId) throws IOException {
         try {
-            String cookieName = getCartCookieName();
-            String cartCookie = CookieUtil.getCookieValue(getRequest(), cookieName);
-            Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
+            Map<Integer, Integer> cartMap = getCartMap();
 
             getQuantityMap(); 
 
@@ -93,6 +102,7 @@ public class CartBean implements Serializable {
 
             cartMap.put(productId, cartMap.getOrDefault(productId, 0) + qtyToAdd);
 
+            String cookieName = getCartCookieName();
             String newCartStr = buildCartCookieString(cartMap);
             CookieUtil.addCookie(getResponse(), cookieName, newCartStr, 60 * 60 * 24 * 7, false);
 
@@ -104,12 +114,11 @@ public class CartBean implements Serializable {
     }
 
     public String removeFromCart(Integer productId) {
-        String cookieName = getCartCookieName();
-        String cartCookie = CookieUtil.getCookieValue(getRequest(), cookieName);
-        Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
+        Map<Integer, Integer> cartMap = getCartMap();
 
         if (cartMap.containsKey(productId)) {
             cartMap.remove(productId);
+            String cookieName = getCartCookieName();
             String newCartStr = buildCartCookieString(cartMap);
             CookieUtil.addCookie(getResponse(), cookieName, newCartStr, 60 * 60 * 24 * 7, false);
         }
@@ -118,12 +127,12 @@ public class CartBean implements Serializable {
     }
 
     public void clearCart() {
+        currentCartMap = new HashMap<>();
         CookieUtil.removeCookie(getResponse(), getCartCookieName());
     }
 
     public List<CartItem> getCartItems() {
-        String cartCookie = CookieUtil.getCookieValue(getRequest(), getCartCookieName());
-        Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
+        Map<Integer, Integer> cartMap = getCartMap();
         List<CartItem> items = new ArrayList<>();
 
         if (!cartMap.isEmpty()) {
@@ -143,6 +152,14 @@ public class CartBean implements Serializable {
             total += item.getTotal();
         }
         return total;
+    }
+
+    public int getAvailableStock(Product p) {
+        if (p == null) return 0;
+        Map<Integer, Integer> cartMap = getCartMap();
+        int inCart = cartMap.getOrDefault(p.getId(), 0);
+        int available = p.getCount() - inCart;
+        return available > 0 ? available : 0;
     }
 
     private int getQuantityToAdd(Integer productId) {

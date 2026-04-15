@@ -50,8 +50,8 @@
                                     </div>
 
                                     <span
-                                        class="product-badge #{p.count > 0 ? 'status-instock text-green-500' : 'status-outofstock text-red-500'}">
-                                        #{p.count > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                                        class="product-badge #{cartBean.getAvailableStock(p) > 0 ? 'status-instock text-green-500' : 'status-outofstock text-red-500'}">
+                                        #{cartBean.getAvailableStock(p) > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                                     </span>
                                 </div>
 
@@ -70,10 +70,10 @@
                                     <h:outputText value="$#{p.price}" styleClass="text-2xl font-semibold">
                                         <f:convertNumber pattern="#0.00" />
                                     </h:outputText>
-                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center gap-2">
-                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}" disabled="#{p.count == 0}" style="width: 5rem;" />
+                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center justify-content-end ml-auto gap-2 mb-2">
+                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{cartBean.getAvailableStock(p)}" disabled="#{cartBean.getAvailableStock(p) == 0}" style="width: 5rem;" />
                                         <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" process="@form" value="Add" icon="pi pi-shopping-cart"
-                                            disabled="#{p.count == 0 }" styleClass="ui-button-success" />
+                                            disabled="#{cartBean.getAvailableStock(p) == 0 }" styleClass="ui-button-success" />
                                     </h:panelGroup>
                                 </div>
                             </div>
@@ -101,13 +101,13 @@
                                     <h:outputText value="$#{p.price}" styleClass="text-2xl font-semibold mb-2">
                                         <f:convertNumber pattern="#0.00" />
                                     </h:outputText>
-                                    <span class="#{p.count > 0 ? 'text-green-500' : 'text-red-500'} font-bold mb-3">
-                                        #{p.count > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                                    <span class="#{cartBean.getAvailableStock(p) > 0 ? 'text-green-500' : 'text-red-500'} font-bold mb-3">
+                                        #{cartBean.getAvailableStock(p) > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
                                     </span>
-                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center gap-2 mb-2">
-                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}" disabled="#{p.count == 0}" style="width: 5rem;" />
+                                    <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center justify-content-end ml-auto gap-2 mb-2">
+                                        <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{cartBean.getAvailableStock(p)}" disabled="#{cartBean.getAvailableStock(p) == 0}" style="width: 5rem;" />
                                         <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" process="@form" value="Add" icon="pi pi-shopping-cart"
-                                            disabled="#{p.count == 0}" styleClass="ui-button-success" />
+                                            disabled="#{cartBean.getAvailableStock(p) == 0}" styleClass="ui-button-success" />
                                     </h:panelGroup>
                                     <p:button value="Login to Shop" icon="pi pi-sign-in"
                                             rendered="#{not authBean.loggedIn}" 

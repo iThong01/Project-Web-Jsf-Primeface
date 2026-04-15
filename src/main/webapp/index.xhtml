@@ -32,6 +32,17 @@
 
                     <div class="p-3 h-full">
                         <div class="shadow-2 p-3 h-full flex flex-column surface-card" style="border-radius: 6px">
+                            
+                            <div class="flex justify-content-between align-items-center mb-3">
+                                <div class="flex align-items-center">
+                                    <i class="pi pi-tag mr-2" />
+                                    <span class="font-semibold">สมุนไพร</span>
+                                </div>
+                                <span class="font-bold #{cartBean.getAvailableStock(p) > 0 ? 'text-green-500' : 'text-red-500'}">
+                                    #{cartBean.getAvailableStock(p) > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                                </span>
+                            </div>
+
                             <h:panelGroup rendered="#{not empty p.base64Image}">
                                 <div class="flex justify-content-center w-full mb-3">
                                     <img src="data:image/jpeg;base64,#{p.base64Image}"
@@ -58,11 +69,11 @@
 
                             <hr class="mb-3 mx-0 border-top-1 border-bottom-none surface-border mt-auto" />
                             <p:growl id="growl" life="3000" />
-                            <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center justify-content-end gap-2 mb-2">
-                                <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{p.count}"
-                                    disabled="#{p.count == 0}" style="width: 5rem;" />
+                            <h:panelGroup rendered="#{authBean.loggedIn}" class="flex align-items-center justify-content-end ml-auto gap-2 mb-2">
+                                <p:spinner value="#{cartBean.quantityMap[p.id]}" min="1" max="#{cartBean.getAvailableStock(p)}"
+                                    disabled="#{cartBean.getAvailableStock(p) == 0}" style="width: 5rem;" />
                                 <p:commandButton action="#{cartBean.addToCart(p.id)}" update="@form" process="@form"
-                                    value="Add" icon="pi pi-shopping-cart" disabled="#{p.count == 0}"
+                                    value="Add" icon="pi pi-shopping-cart" disabled="#{cartBean.getAvailableStock(p) == 0}"
                                     styleClass="ui-button-success" />
                             </h:panelGroup>
                             
