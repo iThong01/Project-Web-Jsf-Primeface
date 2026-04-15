@@ -5,7 +5,6 @@ import com.greenmarket.entity.Product;
 import com.greenmarket.util.CookieUtil;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
@@ -14,11 +13,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import jakarta.inject.Inject;
 
 @Named(value = "cartBean")
@@ -31,113 +32,97 @@ public class CartBean implements Serializable {
     @Inject
     private AuthBean authBean;
 
-    private Map<Integer, Integer> quantityMap = new HashMap<Integer, Integer>() {
+    private static final String BASE_CART_COOKIE_NAME = "SHOPPING_CART";
+
+    private Map<Object, Object> quantityMap = new HashMap<Object, Object>() {
         @Override
-        public Integer get(Object key) {
-            return super.containsKey(key) ? super.get(key) : 1;
+        public Object get(Object key) {
+            Object val = super.get(key);
+            return val != null ? val : 1;
         }
     };
 
-    public Map<Integer, Integer> getQuantityMap() {
+    public Map<Object, Object> getQuantityMap() {
+        if (quantityMap == null) {
+            quantityMap = new HashMap<Object, Object>() {
+                @Override
+                public Object get(Object key) {
+                    Object val = super.get(key);
+                    return val != null ? val : 1;
+                }
+            };
+        }
         return quantityMap;
     }
 
-    public void setQuantityMap(Map<Integer, Integer> quantityMap) {
+    public void setQuantityMap(Map<Object, Object> quantityMap) {
         this.quantityMap = quantityMap;
     }
 
-    private static final String BASE_CART_COOKIE_NAME = "SHOPPING_CART";
+    private HttpServletRequest getRequest() {
+        return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+    }
+
+    private HttpServletResponse getResponse() {
+        return (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+    }
 
     private String getCartCookieName() {
         if (authBean != null && authBean.getCurrentUser() != null) {
             String rawUser = authBean.getCurrentUser().getUser();
-            if (rawUser != null) {
+            if (rawUser != null && !rawUser.isEmpty()) {
                 return BASE_CART_COOKIE_NAME + "_" + rawUser.replaceAll("[^a-zA-Z0-9]", "");
             }
         }
         return BASE_CART_COOKIE_NAME;
     }
-public void addToCart(Integer productId) throws IOException {
-    try {
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
 
-        String cookieName = getCartCookieName();
-        String cartCookie = CookieUtil.getCookieValue(request, cookieName);
-        Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
-
-        if (quantityMap == null) {
-            quantityMap = new HashMap<>();
-        }
-
-        int qtyToAdd = 1;
-        for (Map.Entry<?, Integer> entry : quantityMap.entrySet()) {
-            if (entry.getKey() != null && String.valueOf(entry.getKey()).equals(String.valueOf(productId))) {
-                Object val = entry.getValue();
-                if (val instanceof Number) {
-                    qtyToAdd = ((Number) val).intValue();
-                } else if (val instanceof String) {
-                    try {
-                        qtyToAdd = Integer.parseInt((String) val);
-                    } catch (NumberFormatException e) {
-                    }
-                }
-                break;
-            }
-        }
-
-        cartMap.put(productId, cartMap.getOrDefault(productId, 0) + qtyToAdd);
-
-        String newCartStr = buildCartCookieString(cartMap);
-
-        CookieUtil.addCookie(response, cookieName, newCartStr, 60 * 60 * 24 * 7, false);
-
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_INFO,
-                "Success", "Added " + qtyToAdd + " item(s) to cart"));
-    } catch (Throwable t) {
-        FacesContext.getCurrentInstance().addMessage(null,
-            new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error in AddToCart", t.toString()));
-        t.printStackTrace();
+    private void addMessage(FacesMessage.Severity severity, String summary, String detail) {
+        FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(severity, summary, detail));
     }
-}
+
+    public void addToCart(Integer productId) throws IOException {
+        try {
+            String cookieName = getCartCookieName();
+            String cartCookie = CookieUtil.getCookieValue(getRequest(), cookieName);
+            Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
+
+            getQuantityMap(); 
+
+            int qtyToAdd = getQuantityToAdd(productId);
+
+            cartMap.put(productId, cartMap.getOrDefault(productId, 0) + qtyToAdd);
+
+            String newCartStr = buildCartCookieString(cartMap);
+            CookieUtil.addCookie(getResponse(), cookieName, newCartStr, 60 * 60 * 24 * 7, false);
+
+            addMessage(FacesMessage.SEVERITY_INFO, "Success", "Added " + qtyToAdd + " item(s) to cart");
+        } catch (Exception e) {
+            addMessage(FacesMessage.SEVERITY_ERROR, "Error in AddToCart", e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
     public String removeFromCart(Integer productId) {
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-
         String cookieName = getCartCookieName();
-        String cartCookie = CookieUtil.getCookieValue(request, cookieName);
+        String cartCookie = CookieUtil.getCookieValue(getRequest(), cookieName);
         Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
 
-        Integer keyToRemove = null;
-        for (Integer key : cartMap.keySet()) {
-            if (String.valueOf(key).equals(String.valueOf(productId))) {
-                keyToRemove = key;
-                break;
-            }
-        }
-
-        if (keyToRemove != null) {
-            cartMap.remove(keyToRemove);
+        if (cartMap.containsKey(productId)) {
+            cartMap.remove(productId);
             String newCartStr = buildCartCookieString(cartMap);
-            CookieUtil.addCookie(response, cookieName, newCartStr, 60 * 60 * 24 * 7, false);
+            CookieUtil.addCookie(getResponse(), cookieName, newCartStr, 60 * 60 * 24 * 7, false);
         }
         
         return "/shop/basket.xhtml?faces-redirect=true";
     }
 
+    public void clearCart() {
+        CookieUtil.removeCookie(getResponse(), getCartCookieName());
+    }
+
     public List<CartItem> getCartItems() {
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-
-        String cookieName = getCartCookieName();
-        String cartCookie = CookieUtil.getCookieValue(request, cookieName);
-
-        System.out.println(">>> Cart cookie in getCartItems: " + cartCookie);
-
+        String cartCookie = CookieUtil.getCookieValue(getRequest(), getCartCookieName());
         Map<Integer, Integer> cartMap = parseCartCookie(cartCookie);
         List<CartItem> items = new ArrayList<>();
 
@@ -160,23 +145,42 @@ public void addToCart(Integer productId) throws IOException {
         return total;
     }
 
+    private int getQuantityToAdd(Integer productId) {
+        for (Map.Entry<Object, Object> entry : quantityMap.entrySet()) {
+            if (entry.getKey() != null && String.valueOf(entry.getKey()).equals(String.valueOf(productId))) {
+                Object val = entry.getValue();
+                if (val instanceof Number) {
+                    return ((Number) val).intValue();
+                } else if (val != null) {
+                    try {
+                        return Integer.parseInt(val.toString());
+                    } catch (NumberFormatException ignored) {
+                    }
+                }
+            }
+        }
+        return 1;
+    }
+
     private Map<Integer, Integer> parseCartCookie(String cookieValue) {
         Map<Integer, Integer> map = new HashMap<>();
-        if (cookieValue == null || cookieValue.isEmpty())
+        if (cookieValue == null || cookieValue.trim().isEmpty()) {
             return map;
+        }
 
         try {
-            cookieValue = java.net.URLDecoder.decode(cookieValue, java.nio.charset.StandardCharsets.UTF_8);
+            cookieValue = URLDecoder.decode(cookieValue, StandardCharsets.UTF_8.name());
         } catch (Exception e) {
+            System.err.println("Failed to decode cart cookie: " + e.getMessage());
         }
+
         String[] pairs = cookieValue.split("_");
         for (String pair : pairs) {
             String[] kv = pair.split("-");
             if (kv.length == 2) {
                 try {
-                    map.put(Integer.parseInt(kv[0].trim()),
-                            Integer.parseInt(kv[1].trim()));
-                } catch (NumberFormatException e) {
+                    map.put(Integer.parseInt(kv[0].trim()), Integer.parseInt(kv[1].trim()));
+                } catch (NumberFormatException ignored) {
                 }
             }
         }
@@ -184,21 +188,16 @@ public void addToCart(Integer productId) throws IOException {
     }
 
     private String buildCartCookieString(Map<Integer, Integer> map) {
-        if (map.isEmpty())
+        if (map == null || map.isEmpty()) {
             return "";
+        }
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<Integer, Integer> entry : map.entrySet()) {
-            if (sb.length() > 0)
+            if (sb.length() > 0) {
                 sb.append("_");
+            }
             sb.append(entry.getKey()).append("-").append(entry.getValue());
         }
         return sb.toString();
-    }
-
-    public void clearCart() {
-        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
-        HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
-        String cookieName = getCartCookieName();
-        CookieUtil.removeCookie(response, cookieName);
     }
 }
