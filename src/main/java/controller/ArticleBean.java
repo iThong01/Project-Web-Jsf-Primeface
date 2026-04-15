@@ -49,6 +49,10 @@ public class ArticleBean implements Serializable {
         this.newArticle = article;
     }
 
+    public void prepareNewArticle() {
+        this.newArticle = new Article();
+    }
+
     public void deleteArticle(Article article) {
         try {
             articleService.deleteArticle(article.getId());

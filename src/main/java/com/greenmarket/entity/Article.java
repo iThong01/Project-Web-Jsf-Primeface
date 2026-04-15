@@ -21,6 +21,8 @@ public class Article implements Serializable {
 
     private String head;
 
+    @jakarta.persistence.Lob
+    @jakarta.persistence.Column(columnDefinition = "MEDIUMTEXT")
     private String detail;
 
     private String name;

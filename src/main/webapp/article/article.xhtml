@@ -29,7 +29,9 @@
                                 <span class="text-500 font-medium">#{article.date}</span>
                             </div>
                             <div class="text-900 font-bold text-2xl mb-3">#{article.head}</div>
-                            <div class="text-700 line-height-3 mb-4 flex-grow-1">#{article.detail}</div>
+                            <div class="text-700 line-height-3 mb-4 flex-grow-1">
+                                <h:outputText value="#{article.detail}" escape="false" />
+                            </div>
                             
                             <div class="mt-auto">
                                 <p:button value="อ่านเพิ่มเติม" icon="pi pi-arrow-right" iconPos="right" 

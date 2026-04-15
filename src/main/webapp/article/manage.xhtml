@@ -18,10 +18,9 @@
                     <h2 class="m-0">จัดการบทความ</h2>
                     <p:commandButton value="เพิ่มบทความใหม่" icon="pi pi-plus" 
                                      oncomplete="PF('articleDialog').show()"
-                                     update=":dialogForm:articleDetail" 
-                                     actionListener="#{articleBean.setNewArticle(null)}"
-                                     styleClass="ui-button-success" />
-                </div>
+                                     update=":dialogForm:articleDetail"
+                                     actionListener="#{articleBean.prepareNewArticle()}"
+                                     styleClass="ui-button-success" />                </div>
 
                 <p:dataTable id="dt-articles" widgetVar="dtArticles" var="article" value="#{articleBean.articleList}"
                              reflow="true" styleClass="products-table" rowKey="#{article.id}" paginator="true" rows="10" 
@@ -77,7 +76,7 @@
                             </div>
                             <div class="field mb-3">
                                 <p:outputLabel for="detail">เนื้อหา</p:outputLabel>
-                                <p:inputTextarea id="detail" value="#{articleBean.newArticle.detail}" rows="5" required="true" />
+                                <p:textEditor id="detail" value="#{articleBean.newArticle.detail}" height="300" required="true" secure="false" />
                             </div>
                         </p:outputPanel>
                     </p:outputPanel>
