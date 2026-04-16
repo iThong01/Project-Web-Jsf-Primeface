@@ -12,6 +12,15 @@
         <jakartaee>10.0.0</jakartaee>
     </properties>
     
+    <repositories>
+        <repository>
+            <id>primefaces</id>
+            <name>PrimeFaces Maven Repository</name>
+            <url>https://repository.primefaces.org</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -24,6 +33,11 @@
             <artifactId>primefaces</artifactId>
             <version>15.0.0</version>
             <classifier>jakarta</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.primefaces</groupId>
+            <artifactId>primefaces-themes</artifactId>
+            <version>15.0.0</version>
         </dependency>
         <dependency>
             <groupId>com.mysql</groupId>

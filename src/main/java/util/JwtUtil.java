@@ -9,7 +9,7 @@ import java.util.Date;
  public class JwtUtil {
     private static final String SECRET_STR = "green-market-very-secret-key-2024";
     private static final Key SECRET_KEY = Keys.hmacShaKeyFor(SECRET_STR.getBytes());
-    private static final long EXPIRATION_TIME = 60*60*24*1000;
+    private static final long EXPIRATION_TIME = 60*60*24*7;
     public static String generateToken(String username, String role) {
         return Jwts.builder()
                 .subject(username) 
