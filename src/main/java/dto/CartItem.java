@@ -1,7 +1,8 @@
-package com.greenmarket.dto;
+package dto;
 
-import com.greenmarket.model.Product;
 import java.io.Serializable;
+
+import model.Product;
 
 public class CartItem implements Serializable {
     private Product product;

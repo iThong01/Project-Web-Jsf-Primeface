@@ -1,7 +1,5 @@
-package com.greenmarket.security;
+package security;
 
-import com.greenmarket.util.CookieUtil;
-import com.greenmarket.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -11,6 +9,8 @@ import jakarta.security.enterprise.authentication.mechanism.http.HttpMessageCont
 import jakarta.security.enterprise.credential.UsernamePasswordCredential;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import util.CookieUtil;
+import util.JwtUtil;
 import java.util.Collections;
 import java.util.HashSet;
 import jakarta.security.enterprise.identitystore.IdentityStoreHandler;
@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import java.util.Set;
 import io.jsonwebtoken.ExpiredJwtException;
 import java.io.IOException;
+import jakarta.security.enterprise.AuthenticationStatus;
 
 @ApplicationScoped
 public class JwtAuthenticationMechanism implements HttpAuthenticationMechanism {
@@ -62,7 +63,7 @@ public class JwtAuthenticationMechanism implements HttpAuthenticationMechanism {
                     result.getCallerPrincipal(), groups
                 );
             }
-            return httpMessageContext.responseUnauthorized();
+            return AuthenticationStatus.SEND_FAILURE;
         }
 
         String token = CookieUtil.getCookieValue(request, "AUTH_TOKEN");

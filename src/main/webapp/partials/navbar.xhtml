@@ -5,16 +5,18 @@
             <p:growl id="messages" />
             <p:menubar hideDelay="1000">
                 <f:facet name="start">
-                    <h:link outcome="/index.xhtml" style="text-decoration: none;">
+                    <h:link outcome="/index" style="text-decoration: none;">
                         <h2 class="m-0 mr-4 text-primary">Green Market</h2>
                     </h:link>
                 </f:facet>
 
                 <p:menuitem value="Shop" icon="pi pi-fw pi-shopping-bag" outcome="/shop/shop.xhtml" />
                 <p:menuitem value="Article" icon="pi pi-fw pi-pencil" outcome="/article/article.xhtml" />
-                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" />
-                <p:menuitem value="Manage Article" icon="pi pi-fw pi-file-edit" outcome="/article/manage.xhtml" />
-                <!-- rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}"  -->
+                <p:menuitem value="Manage Product" icon="pi pi-fw pi-cog" outcome="/shop/manage.xhtml" 
+                rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}" />
+                <p:menuitem value="Manage Article" icon="pi pi-fw pi-file-edit" outcome="/article/manage.xhtml" 
+                rendered="#{not empty authBean.currentUser and authBean.currentUser.role eq 'admin'}" />
+                
                 
                 <f:facet name="end">
                     <div class="flex align-items-center gap-3">
@@ -28,14 +30,14 @@
                             </p:autoComplete>
                         </div>
                         <h:panelGroup rendered="#{authBean.loggedIn}">
-                        <p:button icon="pi pi-shopping-cart" outcome="/shop/basket.xhtml"
+                        <p:button icon="pi pi-shopping-cart" outcome="/shop/basket"
                             styleClass="ui-button-rounded ui-button-flat ui-button-secondary" title="ตะกร้าสินค้า" />
                         </h:panelGroup>
                         
 
                         <h:panelGroup rendered="#{not authBean.loggedIn}">
                             <p:button value="Login" icon="pi pi-user" styleClass="ui-button-success"
-                                outcome="/login/login.xhtml" />
+                                outcome="/login/login" />
                         </h:panelGroup>
 
                         <h:panelGroup rendered="#{authBean.loggedIn}" styleClass="flex align-items-center gap-2 ml-3">
@@ -43,7 +45,7 @@
                             
                             <p:menuButton value="#{authBean.currentUser.user}" 
                                           buttonStyleClass="ui-button-flat ui-button-plain font-bold text-700 p-0 ml-1">
-                                <p:menuitem value="ประวัติการสั่งซื้อ" outcome="/shop/history.xhtml" icon="pi pi-history" />
+                                <p:menuitem value="ประวัติการสั่งซื้อ" outcome="/shop/history" icon="pi pi-history" />
                                 
                                 <p:divider />
                                 

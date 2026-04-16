@@ -1,11 +1,13 @@
-package com.greenmarket.service;
+package service;
 
-import com.greenmarket.model.Article;
-import com.greenmarket.dao.ArticleDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import model.Article;
+
 import java.util.List;
+
+import dao.ArticleDAO;
 
 @ApplicationScoped
 public class ArticleService {

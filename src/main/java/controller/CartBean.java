@@ -1,8 +1,5 @@
 package controller;
 
-import com.greenmarket.dto.CartItem;
-import com.greenmarket.model.Product;
-import com.greenmarket.util.CookieUtil;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -11,6 +8,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Product;
+import util.CookieUtil;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import dto.CartItem;
 import jakarta.inject.Inject;
 
 @Named(value = "cartBean")

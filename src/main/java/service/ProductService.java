@@ -1,11 +1,13 @@
-package com.greenmarket.service;
+package service;
 
-import com.greenmarket.model.Product;
-import com.greenmarket.dao.ProductDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import model.Product;
+
 import java.util.List;
+
+import dao.ProductDAO;
 
 @ApplicationScoped
 public class ProductService {

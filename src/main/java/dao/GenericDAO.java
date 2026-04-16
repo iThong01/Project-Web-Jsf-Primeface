@@ -1,4 +1,4 @@
-package com.greenmarket.dao;
+package dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

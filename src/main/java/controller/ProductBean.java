@@ -1,10 +1,11 @@
 package controller;
 
-import com.greenmarket.model.Product;
-import com.greenmarket.service.ProductService;
+import service.ProductService;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import model.Product;
+
 import java.io.Serializable;
 import java.util.List;
 import jakarta.annotation.PostConstruct;

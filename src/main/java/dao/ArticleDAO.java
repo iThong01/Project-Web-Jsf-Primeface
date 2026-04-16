@@ -1,7 +1,8 @@
-package com.greenmarket.dao;
+package dao;
 
-import com.greenmarket.model.Article;
 import jakarta.enterprise.context.ApplicationScoped;
+import model.Article;
+
 import java.util.List;
 
 @ApplicationScoped

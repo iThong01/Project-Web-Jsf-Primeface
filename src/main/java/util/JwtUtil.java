@@ -1,4 +1,4 @@
-package com.greenmarket.util;
+package util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

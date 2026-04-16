@@ -1,4 +1,4 @@
-package com.greenmarket.model;
+package model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;

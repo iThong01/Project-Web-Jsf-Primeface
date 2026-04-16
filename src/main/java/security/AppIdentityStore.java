@@ -1,13 +1,14 @@
-package com.greenmarket.security;
+package security;
 
-import com.greenmarket.model.User;
-import com.greenmarket.service.UserService;
+import service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.security.enterprise.credential.Credential;
 import jakarta.security.enterprise.credential.UsernamePasswordCredential;
 import jakarta.security.enterprise.identitystore.CredentialValidationResult;
 import jakarta.security.enterprise.identitystore.IdentityStore;
+import model.User;
+
 import java.util.Collections;
 import java.util.HashSet;
 

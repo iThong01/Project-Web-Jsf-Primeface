@@ -1,10 +1,10 @@
-package com.greenmarket.service;
+package service;
 
-import com.greenmarket.model.User;
-import com.greenmarket.dao.UserDAO;
+import dao.UserDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import model.User;
 
 @ApplicationScoped
 public class UserService {

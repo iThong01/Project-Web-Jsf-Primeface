@@ -1,13 +1,15 @@
 package controller;
 
-import com.greenmarket.model.User;
-import com.greenmarket.service.UserService;
+import service.UserService;
+import util.CookieUtil;
+import util.JwtUtil;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.User;
 import java.io.Serializable;
 import java.util.Date;
 import jakarta.inject.Inject;
@@ -15,9 +17,6 @@ import jakarta.security.enterprise.SecurityContext;
 import jakarta.security.enterprise.AuthenticationStatus;
 import jakarta.security.enterprise.credential.UsernamePasswordCredential;
 import jakarta.security.enterprise.authentication.mechanism.http.AuthenticationParameters;
-
-import com.greenmarket.util.CookieUtil;
-import com.greenmarket.util.JwtUtil;
 
 @Named(value = "authBean")
 @SessionScoped

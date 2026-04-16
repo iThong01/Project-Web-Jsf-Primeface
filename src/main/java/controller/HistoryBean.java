@@ -1,8 +1,5 @@
 package controller;
 
-import com.greenmarket.model.OrderItem;
-import com.greenmarket.model.Transaction;
-import com.greenmarket.model.User;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
@@ -10,6 +7,10 @@ import jakarta.inject.Named;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+import model.OrderItem;
+import model.Transaction;
+import model.User;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;

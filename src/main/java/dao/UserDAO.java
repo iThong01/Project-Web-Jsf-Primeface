@@ -1,8 +1,8 @@
-package com.greenmarket.dao;
+package dao;
 
-import com.greenmarket.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
+import model.User;
 
 @ApplicationScoped
 public class UserDAO extends GenericDAO<User, Integer> {

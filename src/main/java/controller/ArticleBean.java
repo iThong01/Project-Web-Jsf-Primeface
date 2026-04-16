@@ -1,13 +1,14 @@
 package controller;
 
-import com.greenmarket.model.Article;
-import com.greenmarket.service.ArticleService;
+import service.ArticleService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import model.Article;
+
 import java.io.Serializable;
 import java.util.List;
 
