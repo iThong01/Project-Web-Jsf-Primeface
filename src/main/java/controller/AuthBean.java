@@ -1,6 +1,6 @@
 package controller;
 
-import com.greenmarket.entity.User;
+import com.greenmarket.model.User;
 import com.greenmarket.service.UserService;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;

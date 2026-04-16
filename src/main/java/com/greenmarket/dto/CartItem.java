@@ -1,6 +1,6 @@
 package com.greenmarket.dto;
 
-import com.greenmarket.entity.Product;
+import com.greenmarket.model.Product;
 import java.io.Serializable;
 
 public class CartItem implements Serializable {

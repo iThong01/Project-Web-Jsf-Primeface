@@ -1,6 +1,6 @@
 package controller;
 
-import com.greenmarket.entity.Product;
+import com.greenmarket.model.Product;
 import com.greenmarket.service.ProductService;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;

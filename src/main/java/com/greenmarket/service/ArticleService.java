@@ -1,7 +1,7 @@
 package com.greenmarket.service;
 
-import com.greenmarket.entity.Article;
-import com.greenmarket.repository.ArticleRepository;
+import com.greenmarket.model.Article;
+import com.greenmarket.dao.ArticleDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,7 +11,7 @@ import java.util.List;
 public class ArticleService {
 
     @Inject
-    private ArticleRepository articleRepo;
+    private ArticleDAO articleRepo;
 
     public List<Article> getAllArticles() {
         return articleRepo.findAllOrderedByIdDesc();

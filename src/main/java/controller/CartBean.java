@@ -1,7 +1,7 @@
 package controller;
 
 import com.greenmarket.dto.CartItem;
-import com.greenmarket.entity.Product;
+import com.greenmarket.model.Product;
 import com.greenmarket.util.CookieUtil;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;

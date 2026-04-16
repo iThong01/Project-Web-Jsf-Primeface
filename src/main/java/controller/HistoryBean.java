@@ -1,8 +1,8 @@
 package controller;
 
-import com.greenmarket.entity.OrderItem;
-import com.greenmarket.entity.Transaction;
-import com.greenmarket.entity.User;
+import com.greenmarket.model.OrderItem;
+import com.greenmarket.model.Transaction;
+import com.greenmarket.model.User;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Inject;

@@ -1,6 +1,6 @@
 package controller;
 
-import com.greenmarket.entity.Article;
+import com.greenmarket.model.Article;
 import com.greenmarket.service.ArticleService;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;

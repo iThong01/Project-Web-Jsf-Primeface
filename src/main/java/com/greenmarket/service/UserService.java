@@ -1,7 +1,7 @@
 package com.greenmarket.service;
 
-import com.greenmarket.entity.User;
-import com.greenmarket.repository.UserRepository;
+import com.greenmarket.model.User;
+import com.greenmarket.dao.UserDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -10,7 +10,7 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     @Inject
-    private UserRepository userRepo;
+    private UserDAO userRepo;
 
     public User login(String username, String password) {
         return userRepo.findByCredentials(username, password);

@@ -1,6 +1,6 @@
 package com.greenmarket.security;
 
-import com.greenmarket.entity.User;
+import com.greenmarket.model.User;
 import com.greenmarket.service.UserService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

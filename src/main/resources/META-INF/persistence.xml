@@ -3,10 +3,10 @@
   <persistence-unit name="GreenMarketDB" transaction-type="JTA">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <jta-data-source>java:app/jdbc/GreenMarketDS2</jta-data-source>
-    <class>com.greenmarket.entity.OrderItem</class>
-    <class>com.greenmarket.entity.Transaction</class>
-    <class>com.greenmarket.entity.User</class>
-    <class>com.greenmarket.entity.Product</class>
+    <class>com.greenmarket.model.OrderItem</class>
+    <class>com.greenmarket.model.Transaction</class>
+    <class>com.greenmarket.model.User</class>
+    <class>com.greenmarket.model.Product</class>
     <properties>
       <property name="jakarta.persistence.schema-generation.database.action" value="update"/>
     </properties>

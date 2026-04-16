@@ -1,10 +1,10 @@
 package controller;
 
 import com.greenmarket.dto.CartItem;
-import com.greenmarket.entity.OrderItem;
-import com.greenmarket.entity.Product;
-import com.greenmarket.entity.Transaction;
-import com.greenmarket.entity.User;
+import com.greenmarket.model.OrderItem;
+import com.greenmarket.model.Product;
+import com.greenmarket.model.Transaction;
+import com.greenmarket.model.User;
 import com.greenmarket.util.CookieUtil;
 import com.greenmarket.util.JwtUtil;
 import io.jsonwebtoken.Claims;

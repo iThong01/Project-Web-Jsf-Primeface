@@ -1,4 +1,4 @@
-package com.greenmarket.repository;
+package com.greenmarket.dao;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -6,14 +6,14 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import java.io.Serializable;
 import java.util.List;
 
-public abstract class GenericRepository<T, ID extends Serializable> {
+public abstract class GenericDAO<T, ID extends Serializable> {
 
     @PersistenceContext(unitName = "GreenMarketDB")
     protected EntityManager em;
 
     private final Class<T> entityClass;
 
-    protected GenericRepository(Class<T> entityClass) {
+    protected GenericDAO(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

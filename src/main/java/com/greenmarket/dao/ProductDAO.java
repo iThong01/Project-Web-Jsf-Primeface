@@ -1,13 +1,13 @@
-package com.greenmarket.repository;
+package com.greenmarket.dao;
 
-import com.greenmarket.entity.Product;
+import com.greenmarket.model.Product;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 
 @ApplicationScoped
-public class ProductRepository extends GenericRepository<Product, Integer> {
+public class ProductDAO extends GenericDAO<Product, Integer> {
 
-    public ProductRepository() {
+    public ProductDAO() {
         super(Product.class);
     }
 

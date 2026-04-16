@@ -1,7 +1,7 @@
 package com.greenmarket.service;
 
-import com.greenmarket.entity.Product;
-import com.greenmarket.repository.ProductRepository;
+import com.greenmarket.model.Product;
+import com.greenmarket.dao.ProductDAO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,7 +11,7 @@ import java.util.List;
 public class ProductService {
 
     @Inject
-    private ProductRepository productRepo;
+    private ProductDAO productRepo;
 
     public List<Product> getAllProducts() {
         return productRepo.findAll();

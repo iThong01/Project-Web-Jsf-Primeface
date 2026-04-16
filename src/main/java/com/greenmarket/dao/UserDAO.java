@@ -1,13 +1,13 @@
-package com.greenmarket.repository;
+package com.greenmarket.dao;
 
-import com.greenmarket.entity.User;
+import com.greenmarket.model.User;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.NoResultException;
 
 @ApplicationScoped
-public class UserRepository extends GenericRepository<User, Integer> {
+public class UserDAO extends GenericDAO<User, Integer> {
 
-    public UserRepository() {
+    public UserDAO() {
         super(User.class);
     }
 
